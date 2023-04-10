@@ -1,0 +1,3 @@
+class AppUserType {
+  // anchor,
+}

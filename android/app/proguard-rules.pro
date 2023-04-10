@@ -1,0 +1,8 @@
+-dontwarn com.netease.**
+-keep class com.netease.** {*;}
+-dontwarn org.apache.lucene.**
+-keep class org.apache.lucene.** {*;}
+-keep class net.sqlcipher.** {*;}
+-keep class com.netease.lava.** {*;}
+-keep class com.netease.yunxin.** {*;}
+-keep class tv.danmaku.ijk.media.player.** {*;}
