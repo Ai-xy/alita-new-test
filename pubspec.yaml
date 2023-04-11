@@ -42,7 +42,7 @@ dependencies:
   aliyun_oss_flutter: ^1.0.5
   nim_core: ^1.4.6
   in_app_purchase: ^3.1.1
-  connectivity_plus: ^3.0.2
+  connectivity_plus: ^3.0.3
   hex: ^0.2.0
   crypto: ^3.0.2
   easy_refresh: ^3.3.0+1

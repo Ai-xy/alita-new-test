@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
@@ -63,6 +65,8 @@ class MomentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String tag = '${moment.id}';
+    Random random = new Random();
+
     return HookBuilder(builder: (context) {
       useEffect(() {
         Get.lazyPut(() => _MomentController(moment: moment), tag: tag);
@@ -166,7 +170,8 @@ class MomentCard extends StatelessWidget {
                       ),
                       itemBuilder: (BuildContext context, int i) {
                         final String url = '${moment.imgUrls?.elementAt(i)}';
-                        final String tag = '$url$i';
+                        int num = random.nextInt(900000) + 100000;
+                        final String tag = '$num$i';
                         return GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {

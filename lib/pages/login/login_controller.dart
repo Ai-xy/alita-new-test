@@ -1,3 +1,5 @@
+// import 'dart:html';
+
 import 'package:alita/api/login_api.dart';
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/kit/app_validate_kit.dart';
@@ -43,7 +45,7 @@ class LoginController extends BaseAppController {
 
   Future _afterLogin({required UserProfileModel user}) {
     return saveUserInfo(user).then((value) {
-      return loginYX();
+      return user.valid == 1 ? loginYX() : Get.offAllNamed(AppPath.setProfile);
     }).then((value) {
       return Get.offAllNamed(AppPath.home);
     });
