@@ -27,4 +27,6 @@ class ApiRequest {
     this.withToken = true,
     this.withToast = true,
   });
+
+  void then(Null Function(dynamic data) param0) {}
 }

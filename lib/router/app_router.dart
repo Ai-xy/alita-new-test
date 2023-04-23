@@ -40,6 +40,8 @@ import 'package:alita/pages/set_profile/set_profile_page.dart';
 import 'package:alita/pages/start_live/start_live_binding.dart';
 import 'package:alita/pages/start_live/start_live_page.dart';
 import 'package:alita/pages/vip/vip_page.dart';
+import 'package:alita/pages/wallet/wallet_binding.dart';
+import 'package:alita/pages/wallet/wallet_page.dart';
 import 'package:get/get.dart';
 
 import 'app_path.dart';
@@ -126,6 +128,11 @@ abstract class AppRouter {
     GetPage(
       name: AppPath.vip,
       page: () => const VipPage(),
+    ),
+    GetPage(
+      name: AppPath.wallet,
+      page: () => const WalletPage(),
+      binding: WalletBinding(),
     ),
     GetPage(
       name: AppPath.anchorCenter,

@@ -15,6 +15,7 @@ abstract class AppPath {
   static const String chat = '/chat';
   static const String myLiveRoom = '/myLiveRoom';
   static const String vip = '/vip';
+  static const String wallet = '/wallet';
   static const String anchorCenter = '/anchorCenter';
   static const String liveData = '/liveData';
   static const String blockList = '/blockList';

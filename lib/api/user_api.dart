@@ -105,4 +105,22 @@ abstract class UserApi {
       'followType': 3,
     }));
   }
+
+  static Future rechargeList() {
+    return Http.instance.post(ApiRequest('/api/wallet/rechargeListV2'));
+  }
+
+  static Future rechargePay({
+    String? password,
+    String? payload,
+    String? transactionId,
+    String? type,
+  }) {
+    return Http.instance.post(ApiRequest('/api/ios/v2/pay', formData: {
+      if (password != null) 'password': password,
+      if (payload != null) 'payload': payload,
+      if (transactionId != null) 'gender': transactionId,
+      if (type != null) 'icon': type,
+    }));
+  }
 }

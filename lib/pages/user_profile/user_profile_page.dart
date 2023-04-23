@@ -146,11 +146,13 @@ class UserProfilePage extends StatelessWidget {
                 Builder(builder: (context) {
                   final List<ProfileTileModel> tiles = [
                     ProfileTileModel(
-                      label: AppMessage.myWallet.tr,
-                      value: '${_.user?.diamondNum}',
-                      icon: AppIcon.coin.uri,
-                      backgroundImage: AppIcon.myWalletBackground.uri,
-                    ),
+                        label: AppMessage.myWallet.tr,
+                        value: '${_.user?.diamondNum}',
+                        icon: AppIcon.coin.uri,
+                        backgroundImage: AppIcon.myWalletBackground.uri,
+                        onTap: () {
+                          Get.toNamed(AppPath.wallet);
+                        }),
                     ProfileTileModel(
                         label: AppMessage.userLevel.tr,
                         value: '${_.user?.level}',
