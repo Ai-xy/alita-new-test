@@ -1,4 +1,4 @@
-package com.app.nvwa
+package loveTravel.tourism
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:alita/api/user_api.dart';
 import 'package:alita/base/base_app_controller.dart';
+import 'package:alita/base/base_app_future_controller.dart';
 import 'package:alita/generated/json/base/json_convert_content.dart';
 import 'package:alita/http/http.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
@@ -24,27 +25,38 @@ final bool _kAutoConsume = Platform.isIOS || true;
 
 ///产品列表id
 /// 正式
-const List<String> _kProductIds = <String>[
-  'sTHHVVqFDxhNKiCe', //1450 coins  <Apple ID： 1645862025>
-  'NbffhXzpWxNJunpk', //2450 coins  <Apple ID： 1645862730>
-  'vCxCJChdMBdJDtuw', //4900 coins  <Apple ID： 1645863228>
-  'vjgYFjImlmmBtKtx', //9800 coins <Apple ID： 1645863250>
-  'nItRLZzIDJRCGnXj', //24500 coins <Apple ID： 1645863739>
-  'CSUZqqtexlsTBbPs', //49000 coins <Apple ID： 1645864060>
-];
 // const List<String> _kProductIds = <String>[
-//   'vRaSlMftcFlQUTmD', //1450 coins  <Apple ID： 1645862025>
-//   'WONrOtNGazriKfhD', //2450 coins  <Apple ID： 1645862730>
-//   'uUNtbSaBzvFMyQaL', //5150 coins  <Apple ID： 1645863228>
-//   'wnFInQjOCUDVrcQa', //10600 coins <Apple ID： 1645863250>
-//   'mWRlIggQGObvHKtX', //27200 coins <Apple ID： 1645863739>
-//   'simlUfPKnZyidHQg', //56300 coins <Apple ID： 1645864060>
+//   'sTHHVVqFDxhNKiCe', //1450 coins  <Apple ID： 1645862025>
+//   'NbffhXzpWxNJunpk', //2450 coins  <Apple ID： 1645862730>
+//   'vCxCJChdMBdJDtuw', //4900 coins  <Apple ID： 1645863228>
+//   'vjgYFjImlmmBtKtx', //9800 coins <Apple ID： 1645863250>
+//   'nItRLZzIDJRCGnXj', //24500 coins <Apple ID： 1645863739>
+//   'CSUZqqtexlsTBbPs', //49000 coins <Apple ID： 1645864060>
 // ];
+const List<String> _kProductIds = <String>[
+  'vRaSlMftcFlQUTmD', //1450 coins  <Apple ID： 1645862025>
+  'WONrOtNGazriKfhD', //2450 coins  <Apple ID： 1645862730>
+  'uUNtbSaBzvFMyQaL', //5150 coins  <Apple ID： 1645863228>
+  'wnFInQjOCUDVrcQa', //10600 coins <Apple ID： 1645863250>
+  'mWRlIggQGObvHKtX', //27200 coins <Apple ID： 1645863739>
+  'simlUfPKnZyidHQg', //56300 coins <Apple ID： 1645864060>
+];
 
-class WalletController extends GetxController {
+class WalletController
+    extends BaseAppFutureLoadStateController<UserProfileModel> {
   // userEntity? user;
-  UserProfileModel? get user => UserProfileModel.fromJson(
-      AppLocalStorage.getJson(AppStorageKey.user) ?? {});
+  @override
+  UserProfileModel? user;
+  @override
+  Future<UserProfileModel> loadData({Map? params}) {
+    return UserApi.getUserInfo().then((value) {
+      user = value;
+      return value;
+    }).catchError((err, s) {
+      user = UserProfileModel.fromJson(
+          AppLocalStorage.getJson(AppStorageKey.user) ?? {});
+    }).whenComplete(update);
+  }
 
   int index = 0; //当前选中的充值目标
 
@@ -73,10 +85,18 @@ class WalletController extends GetxController {
   bool _loading = true;
   String? _queryProductError;
   String tag = '充值页';
+  // @override
+  // Future<UserProfileModel> loadData({Map? params}) {
+  //   return UserApi.getUserInfo().then((value) {
+  //     return value;
+  //   }).catchError((err, s) {
+  //     user = UserProfileModel.fromJson(
+  //         AppLocalStorage.getJson(AppStorageKey.user) ?? {});
+  //   }).whenComplete(update);
+  // }
 
   @override
   void onInit() {
-    print(1111);
     super.onInit();
 
     selectProductId = _kProductIds[index];
@@ -97,12 +117,15 @@ class WalletController extends GetxController {
 
   /// 初始化商品信息
   Future<void> initStoreInfo() async {
-    Log.e('初始化商店信息', tag: '充值页');
+    Log.i(
+      tag: '充值页',
+      '初始化商店信息',
+    );
     // 获取应用内商品信息  如果支付平台准备就绪并可用，则返回“true”
     final bool isAvailable = await _inAppPurchase.isAvailable();
     if (!isAvailable) {
       // 如果应用内购买不可用，则输出错误信息并退出函数
-      Log.e('连接到应用内购买服务失败', tag: tag);
+      Log.i('连接到应用内购买服务失败', tag: tag);
       AppToast.alert(message: 'Connection to in-app purchase service failed');
       _isAvailable = isAvailable;
       _products = <ProductDetails>[];
@@ -138,7 +161,7 @@ class WalletController extends GetxController {
       AppToast.alert(message: 'Failed to load');
       // 如果获取商品信息失败，则输出错误信息并退出函数
       _queryProductError = productDetailResponse.error!.message;
-      Log.e('请求商品信息失败: $_queryProductError', tag: tag);
+      Log.i('请求商品信息失败: $_queryProductError', tag: tag);
       _isAvailable = isAvailable;
       _products = productDetailResponse.productDetails;
       _purchases = <PurchaseDetails>[];
@@ -148,7 +171,7 @@ class WalletController extends GetxController {
       update();
       return;
     }
-    Log.e(
+    Log.i(
         'productDetailResponse.productDetails:${productDetailResponse.productDetails}',
         tag: '充值页');
 
@@ -162,17 +185,18 @@ class WalletController extends GetxController {
       _notFoundIds = productDetailResponse.notFoundIDs;
       _purchasePending = false;
       _loading = false;
-      Log.e('获取到商品详情的列表数据长度:${_products.length}', tag: '充值页');
+      Log.i('获取到商品详情的列表数据长度:${_products.length}', tag: '充值页');
       // 排序
       _products.sort((a, b) => a.rawPrice.compareTo(b.rawPrice));
       for (ProductDetails e in _products) {
-        Log.e(
+        Log.i(
             '获取到商品详情数据:id:${e.id}，title:${e.title}，描述description:${e.description}，price(string):${e.price}，rawPrice:${e.rawPrice}，currencyCode:${e.currencyCode}，currencySymbol:${e.currencySymbol}',
             tag: '充值页');
       }
       update();
       return;
     }
+    // cancel();
 
     /// 消耗品商店。
     /// 这是一个开发原型，将耗材优先存储在共享空间中。不要在现实世界的应用程序中使用它。
@@ -214,7 +238,7 @@ class WalletController extends GetxController {
     _purchasePending = false;
     // 可以提示购买失败
     AppToast.alert(message: 'Failed purchase: ${error.message}');
-    Log.e(
+    Log.i(
         '充值失败，错误原因:${error.message},code:${error.code},detail:${error.details},source:${error.source}',
         tag: '充值页面');
     update();
@@ -235,7 +259,7 @@ class WalletController extends GetxController {
     PurchaseVerificationData _verificationData =
         purchaseDetails.verificationData;
     // InAppPurchasePlatform.completePurchase
-    Log.e(
+    Log.i(
         '验证购买的产品数据:purchaseID：$_purchaseID，productID：$_productID，购买的来源source：${_verificationData.source}，verificationData.serverVerificationData：${_verificationData.serverVerificationData}，pendingCompletePurchase${purchaseDetails.pendingCompletePurchase}',
         tag: '充值页面');
     if (_purchaseID != null) {
@@ -257,11 +281,11 @@ class WalletController extends GetxController {
       type: "direct", //充值类型 direct：直接充值，
     )
         .then((value) => {
-              Log.e('通过服务端校验', tag: '充值页面'),
+              Log.i('通过服务端校验', tag: '充值页面'),
               cp.complete(true),
             })
         .onError((error, stackTrace) =>
-            {Log.e('未通过服务端校验，msg:$error', tag: '充值页面'), cp.complete(false)});
+            {Log.i('未通过服务端校验，msg:$error', tag: '充值页面'), cp.complete(false)});
 
     return cp.future;
   }
@@ -270,7 +294,7 @@ class WalletController extends GetxController {
   void _handleInvalidPurchase(PurchaseDetails purchaseDetails) {
     // 如果 _verifyPurchase` 失败，请在此处处理无效购买。
     AppToast.alert(message: 'Failed to verify purchase');
-    Log.e('验证购买失败', tag: tag);
+    Log.i('验证购买失败', tag: tag);
   }
 
   /// 监听商品购买的更新 ，并将更新添加到
@@ -283,7 +307,7 @@ class WalletController extends GetxController {
         showPendingUI();
       } else {
         cancelFun();
-        Log.e('返回的PurchaseStatus:${purchaseDetails.status}', tag: '充值页面');
+        Log.i('返回的PurchaseStatus:${purchaseDetails.status}', tag: '充值页面');
         if (purchaseDetails.status == PurchaseStatus.error) {
           // 购买时发生了一些错误。 购买过程中止。
           handleError(purchaseDetails.error!);
@@ -319,6 +343,7 @@ class WalletController extends GetxController {
           // fetchuser();
           // 更新外面钱包数据
           // Get.find<UserCenterController>().init();
+          loadData();
         } else if (purchaseDetails.status == PurchaseStatus.canceled) {
           AppToast.alert(message: 'cancel payment');
         }
@@ -383,7 +408,6 @@ class WalletController extends GetxController {
 
   @override
   void onReady() {
-    print(1212);
     super.onReady();
   }
 
@@ -405,7 +429,7 @@ class WalletController extends GetxController {
 
   void init() {
     // fetchuser();
-    fetchRechargeList();
+    // fetchRechargeList();
   }
 
   // void fetchuser() {
