@@ -6,7 +6,7 @@ class HotLiveController extends BaseAppFutureLoadStateController {
   List<LiveRoomModel> liveRoomList = [];
   @override
   Future loadData({Map? params}) {
-    return LiveApi.getLiveRoomList().then((value) {
+    return LiveApi.getLiveRoomList(tagId: 32).then((value) {
       liveRoomList = value ?? [];
       return value;
     });

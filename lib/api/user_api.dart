@@ -1,5 +1,7 @@
 import 'package:alita/enum/app_gender.dart';
+import 'package:alita/generated/json/base/json_convert_content.dart';
 import 'package:alita/http/http.dart';
+import 'package:alita/model/api/user_friend_entity.dart';
 import 'package:alita/model/api/user_profile_model.dart';
 
 abstract class UserApi {
@@ -106,6 +108,18 @@ abstract class UserApi {
     }));
   }
 
+  static Future<List<UserFriendEntity>?> getUserFriend({required int type}) {
+    return Http.instance
+        .post(ApiRequest('/api/user/userFriend', formData: {
+      'currentPage': 1,
+      'pageSize': 20,
+      'type': type,
+    }))
+        .then((value) {
+      return JsonConvert.fromJsonAsT<List<UserFriendEntity>>(value.data);
+    });
+  }
+
   static Future rechargeList() {
     return Http.instance.post(ApiRequest('/api/wallet/rechargeListV2'));
   }
@@ -119,8 +133,8 @@ abstract class UserApi {
     return Http.instance.post(ApiRequest('/api/ios/v2/pay', formData: {
       if (password != null) 'password': password,
       if (payload != null) 'payload': payload,
-      if (transactionId != null) 'gender': transactionId,
-      if (type != null) 'icon': type,
+      if (transactionId != null) 'transactionId': transactionId,
+      if (type != null) 'type': type,
     }));
   }
 }

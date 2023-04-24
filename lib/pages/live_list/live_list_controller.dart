@@ -10,9 +10,10 @@ class LiveListController extends BaseAppFutureLoadStateController {
   Future loadData({Map? params}) {
     return LiveApi.getTags().catchError((err, s) {}).then((value) {
       tagList = value ?? [];
+      print(value);
       return value;
     }).then((value) {
-      return LiveApi.getLiveRoomList().then((value) {
+      return LiveApi.getLiveRoomList(tagId: 32).then((value) {
         liveRoomList = value ?? [];
         update();
         return value;

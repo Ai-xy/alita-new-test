@@ -63,7 +63,7 @@ class LiveListPage extends StatelessWidget {
                             alignment: Alignment.center,
                             padding: EdgeInsets.symmetric(horizontal: 18.w),
                             child: Text(
-                              '${_.tagList[i].tagName}',
+                              '${_.tagList[0].tagName}',
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 color: AppColor.white,

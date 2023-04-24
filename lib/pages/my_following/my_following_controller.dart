@@ -5,14 +5,26 @@ import 'package:alita/model/api/user_friend_entity.dart';
 class MyFollowingController extends BaseAppFutureLoadStateController {
   // List<LiveTagModel> tagList = [];
   // List<LiveRoomModel> liveRoomList = [];
-  List<UserFriendEntity> followUserList = [];
+  List<UserFriendEntity> followUserList1 = [];
+  List<UserFriendEntity> followUserList2 = [];
+  List<UserFriendEntity> followUserList3 = [];
 
   @override
   Future loadData({Map? params}) {
-    return UserApi.followUser(
-      userId: user?.userId ?? 0,
+    UserApi.getUserFriend(
+      type: 2,
     ).then((value) {
-      print(value);
+      followUserList1 = value!;
+    }).whenComplete(update);
+    UserApi.getUserFriend(
+      type: 2,
+    ).then((value) {
+      followUserList3 = value!;
+    }).whenComplete(update);
+    return UserApi.getUserFriend(
+      type: 3,
+    ).then((value) {
+      followUserList1 = value!;
     }).whenComplete(update);
   }
 }
