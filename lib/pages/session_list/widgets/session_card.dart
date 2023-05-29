@@ -72,20 +72,22 @@ class SessionCard extends GetView<SessionListController> {
                     Positioned(
                       top: 1.h,
                       right: 0,
-                      child: Container(
-                        width: 12.r,
-                        height: 12.r,
-                        decoration: BoxDecoration(
-                          color: AppColor.messageBadageColor,
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '${session.unreadCount}',
-                          style:
-                              TextStyle(fontSize: 9.sp, color: AppColor.white),
-                        ),
-                      ),
+                      child: session.unreadCount != 0
+                          ? Container(
+                              width: 12.r,
+                              height: 12.r,
+                              decoration: BoxDecoration(
+                                color: AppColor.messageBadageColor,
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${session.unreadCount}',
+                                style: TextStyle(
+                                    fontSize: 9.sp, color: AppColor.white),
+                              ),
+                            )
+                          : Container(),
                     )
                   ],
                 ),
@@ -101,8 +103,9 @@ class SessionCard extends GetView<SessionListController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
+                            /// tip类型消息
                             child: Text(
-                              session.sessionType == NIMSessionType.system
+                              session.lastMessageType == NIMMessageType.tip
                                   ? AppMessage.officalNotice.tr
                                   : '${session.senderNickname}',
                               style: TextStyle(

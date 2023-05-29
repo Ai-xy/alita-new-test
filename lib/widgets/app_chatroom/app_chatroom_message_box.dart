@@ -28,6 +28,7 @@ class AppChatRoomMessageBox<T extends AppChatRoomController>
             itemBuilder: (BuildContext context, int i) {
               NIMChatroomMessage message = _.messageList[i];
               Log.i('Message==>${message.content}');
+              Log.i('MessageMap==>${message.toMap()}');
               return Container(
                 padding: EdgeInsets.only(
                   top: 5.h,

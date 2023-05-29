@@ -1,6 +1,6 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
-import 'package:alita/pages/live_room/sheets/live_anchor_sheet.dart';
+import 'package:alita/pages/live_room/sheets/live_anchor_sheet/live_anchor_sheet.dart';
 import 'package:alita/pages/live_room/sheets/live_watcher_sheet.dart';
 import 'package:alita/widgets/app_chatroom/app_chatroom_controller.dart';
 import 'package:alita/widgets/app_image.dart';
@@ -10,6 +10,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
 
+/// 直播间左上角房间信息
 class AppChatRoomWatcherTile<T extends AppChatRoomController>
     extends StatelessWidget {
   final Function() onClose;
@@ -32,10 +33,14 @@ class AppChatRoomWatcherTile<T extends AppChatRoomController>
               ),
               child: Row(
                 children: [
+                  /// 点击头像弹窗
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      Get.bottomSheet(LiveAnchorSheet(liveRoom: _.liveRoom));
+                      Get.bottomSheet(LiveAnchorSheet(
+                        liveRoom: _.liveRoom,
+                        userId: _.liveRoom.homeownerId,
+                      ));
                     },
                     child: AppImage(
                       '${_.liveRoom.homeownerIcon}',

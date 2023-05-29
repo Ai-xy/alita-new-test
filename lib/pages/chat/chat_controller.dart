@@ -34,6 +34,11 @@ class ChatController extends BaseAppFutureLoadStateController {
     _subscription = NimCore.instance.messageService.onMessage.listen((event) {
       _addMessageList(event);
     });
+    // 跟新未读数
+    final sessionInfo = NIMSessionInfo(
+        sessionId: conversation.session.sessionId,
+        sessionType: NIMSessionType.p2p);
+    updateSessionReadStatus(sessionInfo);
     super.onInit();
   }
 
@@ -120,6 +125,15 @@ class ChatController extends BaseAppFutureLoadStateController {
           duration: const Duration(milliseconds: 10),
           curve: Curves.linearToEaseOut);
     });
+  }
+
+  // 更新会话
+  void updateSession() {}
+
+  // update会话状态
+  updateSessionReadStatus(NIMSessionInfo sessionInfo) async {
+    NimCore.instance.messageService.clearSessionUnreadCount([sessionInfo]);
+    update();
   }
 
   // Future _scrollToAnchor(NIMMessage anchor) {

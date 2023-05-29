@@ -83,7 +83,7 @@ class _ReceiverMessageCard extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           Gap(12.w),
-          _MessageContent(message: message, isMe: false),
+          Expanded(child: _MessageContent(message: message, isMe: false)),
         ],
       ),
     );

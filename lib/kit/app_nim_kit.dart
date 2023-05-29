@@ -4,6 +4,8 @@ import 'package:alita/config/app_config.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nim_core/nim_core.dart';
 import 'package:video_player/video_player.dart';
 
@@ -54,9 +56,11 @@ class AppNimKit {
               account: '${user.yxAccid}', token: '${user.imToken}'))
           .then((value) {
         Log.i('IM登录结果$value', tag: tag);
+        AppToast.alert(message: 'login success');
         return true;
       }).catchError((err, s) {
         Log.e('IM登录出错', tag: tag, error: err, stackTrace: s);
+        AppToast.alert(message: 'login fail');
         return false;
       });
     });

@@ -13,6 +13,16 @@ abstract class UserApi {
     });
   }
 
+  // 查询用户信息
+  static Future<UserProfileModel> getUserDetail({int? userId, String? yxId}) {
+    return Http.instance
+        .post(ApiRequest('/api/index/getUserDetail',
+            formData: {"userId": userId, "yxAccid": yxId}))
+        .then((value) {
+      return UserProfileModel.fromJson(value.data);
+    });
+  }
+
   static Future updateUserInfo({
     String? birthday,
     String? country,

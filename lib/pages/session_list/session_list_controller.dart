@@ -12,14 +12,18 @@ class SessionListController extends BaseAppFutureLoadStateController {
 
   @override
   Future loadData({Map? params}) {
+    Log.d('加载信息');
     NimCore.instance.messageService.querySessionList(100).then((value) {
-      Log.d('$value');
+      Log.d('哈哈哈${value.toMap()}');
       if (value.data is List<NIMSession>) {
         conversationList.value = (value.data as List<NIMSession>)
             .where((e) => e.sessionId != null.toString())
             .map((e) => AppUserConversationModel(session: e))
             .toList();
         return Future.forEach<AppUserConversationModel>(conversationList, (e) {
+          print('就哦哦');
+
+          print(e.session.toMap());
           return NimCore.instance.userService
               .getUserInfo(e.session.sessionId)
               .then((value) {
@@ -32,4 +36,6 @@ class SessionListController extends BaseAppFutureLoadStateController {
     });
     return Future.value();
   }
+
+
 }

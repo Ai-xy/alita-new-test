@@ -86,9 +86,17 @@ class LiveRoomCard extends StatelessWidget {
       : super(key: key);
 
   void joinLiveRoom() {
-    Get.toNamed(AppPath.anchorLiveEnd,
-        preventDuplicates: false, arguments: liveRoom);
-    return;
+    // if(liveRoom.liveState==2){
+    //   Get.toNamed(AppPath.liveRoom,
+    //       preventDuplicates: false, arguments: liveRoom);
+    // }else{
+    //   Get.toNamed(AppPath.anchorLiveEnd,
+    //       preventDuplicates: false, arguments: liveRoom);
+    // }
+
+    // Get.toNamed(AppPath.anchorLiveEnd,
+    //     preventDuplicates: false, arguments: liveRoom);
+
     if (PictureInPicture.isActive) {
       PictureInPicture.stopPiP();
     }
@@ -96,10 +104,13 @@ class LiveRoomCard extends StatelessWidget {
     LiveApi.getLiveStream(
             id: liveRoom.id ?? 0, password: '${liveRoom.password}')
         .then((value) {
+      print('value值');
+      print(value);
       Get.toNamed(AppPath.liveRoom,
           arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
           preventDuplicates: false);
     }).whenComplete(cancelFunc);
+    return;
   }
 
   @override

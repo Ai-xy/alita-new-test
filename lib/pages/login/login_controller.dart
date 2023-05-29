@@ -46,7 +46,8 @@ class LoginController extends BaseAppController {
   Future _afterLogin({required UserProfileModel user}) {
     return saveUserInfo(user).then((value) {
       return user.valid == 1 ? loginYX() : Get.offAllNamed(AppPath.setProfile);
-    }).then((value) {
+    }).then((value) async {
+      await loginYX();
       return Get.offAllNamed(AppPath.home);
     });
   }
