@@ -22,6 +22,8 @@ abstract class BaseAppController extends GetxController {
 
   String get userNickname => '${user?.nickname}';
 
+  String get userGender => '${user?.gender}';
+
   String getCountryEmojiByName(String name) {
     if (Get.isRegistered<CountryService>()) {
       CountryService service = Get.find<CountryService>();

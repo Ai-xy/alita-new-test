@@ -12,9 +12,9 @@ class MyFollowingController extends BaseAppFutureLoadStateController {
   @override
   Future loadData({Map? params}) {
     UserApi.getUserFriend(
-      type: 2,
+      type: 1,
     ).then((value) {
-      followUserList1 = value!;
+      followUserList2 = value!;
     }).whenComplete(update);
     UserApi.getUserFriend(
       type: 2,

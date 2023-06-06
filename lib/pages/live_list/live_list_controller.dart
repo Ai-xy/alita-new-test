@@ -14,11 +14,6 @@ class LiveListController extends BaseAppFutureLoadStateController {
       return value;
     }).then((value) {
       return LiveApi.getLiveRoomList(tagId: 32).then((value) {
-        value?.forEach((element) {
-          print('加载数据');
-
-          print(element.toJson());
-        });
         print(value.toString());
         liveRoomList = value ?? [];
         update();

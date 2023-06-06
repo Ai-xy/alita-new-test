@@ -121,6 +121,11 @@ enum AppIcon {
   liveStreamEnd('assets/images/live_stream_end.png'),
   getCoinBackground('assets/images/get_coin_background.png'),
   removeFromBlackList('assets/images/remove_from_blacklist.png'),
+  userProfileBg('assets/images/user_profile_bg.png'),
+  watcherListClose('assets/images/watcher_close.png'),
+  watcherFemale('assets/images/icon_female.png'),
+  watcherMale('assets/images/icon_male.png'),
+  home('assets/images/home.png')
   ;
 
   final String uri;

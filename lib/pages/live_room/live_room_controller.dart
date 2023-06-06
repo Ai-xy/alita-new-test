@@ -16,11 +16,15 @@ class LiveRoomController extends AppChatRoomController {
   @override
   void onInit() {
     print('直播间信息');
+    print(live.streamUrl);
     print(live.liveRoom.toJson());
+    print('liveRoom.streamUrl: ${liveRoom.streamUrl}');
     getUser();
     checkIsRoomOwner();
+    // fijkPlayer = FijkPlayer()
+    //   ..setDataSource('${liveRoom.streamUrl}', autoPlay: true, showCover: true);
     fijkPlayer = FijkPlayer()
-      ..setDataSource('${liveRoom.streamUrl}', autoPlay: true, showCover: true);
+      ..setDataSource(live.streamUrl, autoPlay: true, showCover: true);
     onEnterRoom();
     super.onInit();
   }

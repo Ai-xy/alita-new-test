@@ -66,12 +66,14 @@ class LiveRoomPage extends GetView<LiveRoomController> {
                     child:
                         AppChatRoomWatcherTile<LiveRoomController>(onClose: () {
                       Get.back();
-                      PictureInPicture.startPiP(
-                          pipWidget: AppFloatingPlayer(
-                        fijkPlayer: controller.fijkPlayer,
-                        live: controller.live,
-                      ));
+                      controller.onClose();
+                      // PictureInPicture.startPiP(
+                      //     pipWidget: AppFloatingPlayer(
+                      //   fijkPlayer: controller.fijkPlayer,
+                      //   live: controller.live,
+                      // ));
                     })),
+
                 /// 房间内聊天信息
                 Positioned(
                   bottom: 118.h,

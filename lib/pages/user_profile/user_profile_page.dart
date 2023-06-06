@@ -72,6 +72,7 @@ class UserProfilePage extends StatelessWidget {
                       width: 68.r,
                       height: 68.r,
                       borderRadius: BorderRadius.circular(34.r),
+                      fit: BoxFit.cover,
                     ),
                     Gap(18.w),
                     Expanded(
@@ -285,7 +286,7 @@ class UserProfilePage extends StatelessWidget {
                     ProfileTileModel(
                         label: AppMessage.anchorCenter.tr,
                         onTap: () {
-                          Get.toNamed(AppPath.anchorProfile);
+                          Get.toNamed(AppPath.anchorProfile, arguments: _.user);
                         }),
                     ProfileTileModel(
                         label: AppMessage.officialCustomerService.tr),

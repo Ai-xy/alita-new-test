@@ -13,6 +13,7 @@ class ChatTextMessageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: const BoxConstraints(maxWidth: 180.0),
       padding: EdgeInsets.all(15.r),
       decoration: BoxDecoration(
         color: isSelf ? const Color(0xFFFEA623) : const Color(0xFFF9F9F9),

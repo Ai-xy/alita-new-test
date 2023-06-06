@@ -10,8 +10,12 @@ import 'package:alita/kit/app_date_time_kit.dart';
 import 'package:alita/model/api/dynamic_comment_model.dart';
 import 'package:alita/model/api/moment_model.dart';
 import 'package:alita/model/ui/app_gallery_model.dart';
+import 'package:alita/pages/anchor_profile/anchor_profile_controller.dart';
+import 'package:alita/pages/follow/follow_controller.dart';
 import 'package:alita/pages/photo_viewer/photo_viewer_page.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_bottom_input_field.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:flutter/material.dart';
@@ -50,17 +54,33 @@ class _MomentController extends BaseAppFutureLoadStateController {
     ));
   }
 
-  Future like() {
-    return MomentApi.likeMoment(momentId: '${moment.id}', like: !liked)
+  Future like(int flag) {
+    return MomentApi.likeMoment(momentId: '${moment.id}', like: flag)
         .then((value) {
       moment.likeFlag = !liked ? 0 : 1;
+    }).whenComplete(update);
+  }
+
+  Future delete(String id) {
+    return MomentApi.delete(id).then((value) {
+      update();
+      Get.back();
     }).whenComplete(update);
   }
 }
 
 class MomentCard extends StatelessWidget {
   final MomentModel moment;
-  const MomentCard({Key? key, required this.moment}) : super(key: key);
+  final AnchorProfileController? anchorProfileController;
+  final FollowController? followController;
+  final bool isMe; // 是否是个人主页的朋友圈
+  const MomentCard(
+      {Key? key,
+      required this.moment,
+      required this.isMe,
+      this.anchorProfileController,
+      this.followController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -114,29 +134,36 @@ class MomentCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.only(left: 4.w, right: 14.w),
-                        height: 24.h,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                                color: AppColor.borderColor.withOpacity(.37))),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              AppIcon.living.uri,
-                              width: 18.r,
-                              height: 18.r,
+                      isMe
+                          ? GestureDetector(
+                              onTap: () {
+                                _deleteMomentDialog(_, '${moment.id}');
+                              },
+                              child: const Icon(Icons.more_vert))
+                          : Container(
+                              padding: EdgeInsets.only(left: 4.w, right: 14.w),
+                              height: 24.h,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                      color: AppColor.borderColor
+                                          .withOpacity(.37))),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    AppIcon.living.uri,
+                                    width: 18.r,
+                                    height: 18.r,
+                                  ),
+                                  Gap(8.w),
+                                  Text(
+                                    AppMessage.live.tr,
+                                    style: TextStyle(
+                                        fontSize: 12.sp, color: AppColor.grey),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Gap(8.w),
-                            Text(
-                              AppMessage.live.tr,
-                              style: TextStyle(
-                                  fontSize: 12.sp, color: AppColor.grey),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                   Gap(14.h),
@@ -207,10 +234,27 @@ class MomentCard extends StatelessWidget {
                           children: [
                             HookBuilder(builder: (context) {
                               return GestureDetector(
-                                onTap: _.like,
+                                onTap: () {
+                                  int flag = moment.likeFlag!;
+                                  if (flag == 0) {
+                                    flag = 1;
+                                  } else {
+                                    flag = 0;
+                                  }
+                                  _.like(flag).then((value) {
+                                    if (isMe) {
+                                      anchorProfileController
+                                          ?.loadMomentsData();
+                                    } else {
+                                      if (followController != null) {
+                                        followController?.loadData();
+                                      } else {}
+                                    }
+                                  });
+                                },
                                 behavior: HitTestBehavior.opaque,
                                 child: Image.asset(
-                                  _.liked
+                                  moment.likeFlag == 1
                                       ? AppIcon.thumbActive.uri
                                       : AppIcon.thumb.uri,
                                   width: 24.r,
@@ -221,7 +265,7 @@ class MomentCard extends StatelessWidget {
                             Gap(4.w),
                             Transform.translate(
                                 offset: Offset(0, 0.5.h),
-                                child: Text('${_.moment.likeNum}',
+                                child: Text('${moment.likeNum}',
                                     style: AppTextStyle.bodyMedium)),
                           ],
                         ),
@@ -274,5 +318,63 @@ class MomentCard extends StatelessWidget {
             );
           });
     });
+  }
+
+  Future _deleteMomentDialog(_MomentController _, String id) async {
+    Get.dialog(Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                _.delete(id).then((value) {
+                  anchorProfileController?.loadMomentsData();
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 50, 94, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 25.w),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(254, 166, 35, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

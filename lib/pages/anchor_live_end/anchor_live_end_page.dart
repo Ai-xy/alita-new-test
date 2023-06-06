@@ -2,6 +2,7 @@ import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/pages/anchor_live_end/anchor_live_end_controller.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_button.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,11 @@ class AnchorLiveEndPage extends GetView<AnchorLiveEndController> {
                   AppButton(
                     width: 160.w,
                     text: AppMessage.follow.tr,
-                    onTap: controller.follow,
+                    onTap: () {
+                      controller.isFollowed
+                          ? AppToast.alert(message: 'You\'re already friends')
+                          : controller.follow();
+                    },
                     withIcon: true,
                     icon: Image.asset(
                       AppIcon.anchorFollow.uri,

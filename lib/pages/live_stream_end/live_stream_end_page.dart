@@ -2,6 +2,7 @@ import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/pages/live_stream_end/live_stream_end_controller.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +27,9 @@ class LiveStreamEndPage extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: Get.back,
+                onTap: () {
+                  Get.back();
+                },
                 child: Image.asset(
                   AppIcon.exit.uri,
                   width: 18.r,

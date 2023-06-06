@@ -106,7 +106,8 @@ class AppButton extends StatelessWidget {
                     icon ?? const SizedBox.shrink(),
                     Text(
                       text,
-                      style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                      style: textStyle ??
+                          TextStyle(fontSize: 16.sp, color: Colors.white),
                     ),
                   ],
                 )

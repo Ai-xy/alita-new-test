@@ -3,6 +3,7 @@ import 'package:alita/model/api/anchor_model.dart';
 import 'package:alita/model/api/gift_model.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/live_tag_model.dart';
+import 'package:alita/util/log.dart';
 
 abstract class LiveApi {
   static Future<List<LiveTagModel>?> getTags() {
@@ -71,19 +72,29 @@ abstract class LiveApi {
   }) {
     return Http.instance
         .post(ApiRequest('/api/expand/wearLive/saveLiveRoom', formData: {
-          'coverImg': cover,
-          'homeownerIcon': userIcon,
-          'homeownerId': userId,
-          'homeownerNickname': userNickname,
-          'label': 'Hot',
-          'liveRoomName': 'test',
-          'liveState': 0,
-          'lockFlag': '${isLocked ? 1 : 0}',
-          'password': password,
-          'sentiment': 0,
-        }))
-        .then((value) => LiveRoomModel.fromJson(value.data));
+      'coverImg': cover,
+      'homeownerIcon': userIcon,
+      'homeownerId': userId,
+      'homeownerNickname': userNickname,
+      'label': 'Hot',
+      'liveRoomName': 'test',
+      'liveState': 0,
+      'lockFlag': '${isLocked ? 1 : 0}',
+      'password': password,
+      'sentiment': 0,
+    }))
+        .then((value) {
+      //Log.d('创建房间信息是${value.data}');
+      LiveRoomModel model = LiveRoomModel();
+      model = LiveRoomModel.fromJson(value.data);
+      //Log.d('创建房间返回的信息是${model.toJson()}');
+      return model;
+    });
   }
+
+//   static Future<LiveRoomModel> joinRecordRoom({
+//
+// })
 
   static Future<List<GiftModel>> getGiftList() {
     return Http.instance
@@ -96,6 +107,16 @@ abstract class LiveApi {
   static Future queryMyLiveRoomInfo() {
     return Http.instance.post(ApiRequest(
         '/api/expand/wearLive/queryMyRoomGiftStat',
-        formData: {'searchValue': ''}));
+        formData: {'searchValue': 'gift|follower|duration'}));
+  }
+
+  // 直播间送礼
+  static Future sendGift(int giftId, int targetId, int num) {
+    return Http.instance.post(ApiRequest('/api/expand/wearLive/sendGift',
+        formData: {
+          "giftId": giftId,
+          "receiverUserId": targetId,
+          "sendNum": num
+        }));
   }
 }

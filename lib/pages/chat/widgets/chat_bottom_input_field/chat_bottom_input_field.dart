@@ -1,7 +1,9 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/model/ui/chat_action_model.dart';
+import 'package:alita/pages/chat/chat_controller.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_button.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/gestures.dart';
@@ -9,7 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
+
+import 'chat_bottom_input_controller.dart';
 
 class ChatBottomInputField extends StatelessWidget {
   final Function(String) onSubmitted;
@@ -27,6 +32,8 @@ class ChatBottomInputField extends StatelessWidget {
     return HookBuilder(builder: (context) {
       ValueNotifier<bool> mediaPanelVisible = useState(false);
       ValueNotifier<bool> emojiPanelVisible = useState(false);
+      ValueNotifier<bool> voicePanelVisible = useState(false);
+
       TextEditingController editingController = useTextEditingController();
       FocusNode focusNode = useFocusNode();
       useListenable(editingController);
@@ -145,17 +152,22 @@ class ChatBottomInputField extends StatelessWidget {
                   Gap(10.w),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onLongPress: () {},
-                    onLongPressDown: (LongPressDownDetails details) {
-                      NimCore.instance.audioService
-                          .startRecord(AudioOutputFormat.AAC, 60);
+                    onTap: () {
+                      voicePanelVisible.value = !voicePanelVisible.value;
                     },
-                    onLongPressEnd: (LongPressEndDetails details) {
-                      NimCore.instance.audioService.stopRecord();
-                    },
-                    onLongPressCancel: () {
-                      NimCore.instance.audioService.cancelRecord();
-                    },
+                    // onLongPress: () {
+                    //   AppToast.alert(message: 'message');
+                    // },
+                    // onLongPressDown: (LongPressDownDetails details) {
+                    //   NimCore.instance.audioService
+                    //       .startRecord(AudioOutputFormat.AAC, 60);
+                    // },
+                    // onLongPressEnd: (LongPressEndDetails details) {
+                    //   NimCore.instance.audioService.stopRecord();
+                    // },
+                    // onLongPressCancel: () {
+                    //   NimCore.instance.audioService.cancelRecord();
+                    // },
                     child: Image.asset(
                       AppIcon.chatVoice.uri,
                       width: 24.r,
@@ -224,7 +236,86 @@ class ChatBottomInputField extends StatelessWidget {
                 textEditingController: editingController,
                 config: Config(columns: 7, bgColor: AppColor.white),
               ),
-            )
+            ),
+            GetBuilder<ChatController>(builder: (_) {
+              return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: voicePanelVisible.value == false
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(vertical: 15.h),
+                  child: voicePanelVisible.value == false
+                      ? const SizedBox.shrink()
+                      : GestureDetector(
+                          onTap: () {},
+                          onLongPressDown: (details) {
+                            /// 开始录制
+                            _.startRecord();
+                            _.isButtonPressed = true;
+                            _.startPosition = details.globalPosition;
+                            _.update();
+                          },
+                          onLongPressCancel: () {
+                            /// 取消录制
+                            _.cancelRecord();
+                            AppToast.alert(
+                                message: 'The recording time is too short');
+
+                            _.isButtonPressed = false;
+                            _.distance = 0.0;
+                            _.update();
+                          },
+                          onLongPressUp: () {
+                            if (_.isCancelRecord) {
+                              _.cancelRecord();
+                              AppToast.alert(message: 'Cancel Record');
+                            } else {
+                              _.endRecord();
+                            }
+                            _.isCancelRecord = false;
+                            _.isButtonPressed = false;
+                            _.distance = 0.0;
+                            _.update();
+                          },
+                          onLongPressMoveUpdate: (details) {
+                            // 计算手指移动的距离
+                            Offset currentPosition = details.globalPosition;
+                            double distance =
+                                (currentPosition - _.startPosition).distance;
+                            _.distance = distance;
+
+                            // 判断手指是否已经滑出按钮的范围
+                            if (distance > 60.0) {
+                              _.isButtonPressed = false;
+                              _.startPosition = details.globalPosition;
+                              _.isCancelRecord = true;
+                              _.update();
+                            }
+                          },
+                          child: Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1,
+                                ),
+                                color: _.isButtonPressed
+                                    ? Colors.grey
+                                    : AppColor.yellow),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: Center(
+                                child: Image.asset(
+                                  'assets/images/chat_voice.png',
+                                  height: 30.w,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ));
+            }),
           ],
         ),
       );

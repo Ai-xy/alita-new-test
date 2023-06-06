@@ -35,8 +35,13 @@
 	<string>App requires access to the camera for live streaming feature.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>App requires access to the microphone for live streaming feature.</string>
+
+
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string></string>
+    <string>Save video in gallery</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Save audio in video</string>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

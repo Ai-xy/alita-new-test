@@ -18,6 +18,18 @@ class AppNimKit {
 
   static const String tag = 'NIM';
 
+  // 消息列表
+  List<NIMMessage> _messages = List.empty(growable: true);
+  List<NIMMessage> get messages => _messages;
+
+  void setMessages(List<NIMMessage> data) {
+    _messages = data;
+  }
+
+  addMessages(NIMMessage data) {
+    _messages.add(data);
+  }
+
   final UserProfileModel user = UserProfileModel.fromJson(
       AppLocalStorage.getJson(AppStorageKey.user) ?? {});
   AppNimKit._();
@@ -66,13 +78,15 @@ class AppNimKit {
     });
   }
 
-  Future<bool> enterChatRoom({
-    required String yxRoomId,
-    required String nickname,
-    required String avatar,
-  }) {
+  Future<bool> enterChatRoom(
+      {required String yxRoomId,
+      required String nickname,
+      required String avatar,
+      required String gender,
+      required String userId}) {
     return NimCore.instance.chatroomService
         .enterChatroom(NIMChatroomEnterRequest(
+      extension: {'gender': gender, 'userId': userId},
       roomId: yxRoomId,
       nickname: nickname,
       avatar: avatar,

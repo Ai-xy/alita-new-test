@@ -9,7 +9,8 @@ import 'package:get/get.dart';
 
 class LiveActionSheet extends StatelessWidget {
   final List<AppLiveActionModel> actions;
-  const LiveActionSheet({Key? key, required this.actions}) : super(key: key);
+  const LiveActionSheet({Key? key, required this.actions})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,25 +22,26 @@ class LiveActionSheet extends StatelessWidget {
           runSpacing: 20.h,
           children: [
             for (AppLiveActionModel item in actions
-            // [
-            //   AppLiveActionModel(
-            //       icon: AppIcon.anchorFlipCamera.uri, label: 'Flip'),
-            //   AppLiveActionModel(
-            //       icon: AppIcon.recordScreen.uri, label: 'Record screens'),
-            //   AppLiveActionModel(
-            //       icon: AppIcon.clearScreen.uri, label: 'Clear the screen'),
-            //   AppLiveActionModel(
-            //       icon: AppIcon.liveRoomMore.uri, label: 'Screenshots'),
-            //   AppLiveActionModel(
-            //       icon: AppIcon.clearScreen.uri, label: 'Clear the screen'),
-            //   AppLiveActionModel(
-            //       icon: AppIcon.liveRoomMore.uri, label: 'Screenshots'),
-            // ]
-            )
+                // [
+                //   AppLiveActionModel(
+                //       icon: AppIcon.anchorFlipCamera.uri, label: 'Flip'),
+                //   AppLiveActionModel(
+                //       icon: AppIcon.recordScreen.uri, label: 'Record screens'),
+                //   AppLiveActionModel(
+                //       icon: AppIcon.clearScreen.uri, label: 'Clear the screen'),
+                //   AppLiveActionModel(
+                //       icon: AppIcon.liveRoomMore.uri, label: 'Screenshots'),
+                //   AppLiveActionModel(
+                //       icon: AppIcon.clearScreen.uri, label: 'Clear the screen'),
+                //   AppLiveActionModel(
+                //       icon: AppIcon.liveRoomMore.uri, label: 'Screenshots'),
+                // ]
+                )
               GestureDetector(
-                onTap: () {
-                  Get.find<MyLiveRoomController>().flipCamera();
-                },
+                onTap: item.onTap,
+                //       (){
+                //     Get.find<MyLiveRoomController>().flipCamera();
+                // }
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   alignment: Alignment.center,

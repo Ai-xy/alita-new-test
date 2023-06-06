@@ -2,13 +2,16 @@ import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/enum/app_gender.dart';
 import 'package:alita/model/api/user_friend_entity.dart';
+import 'package:alita/model/ui/app_conversation_model.dart';
 import 'package:alita/pages/my_following/my_following_controller.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:nim_core/nim_core.dart';
 import 'package:tab_indicator_styler/tab_indicator_styler.dart';
 
 class MyFollowingPage extends StatelessWidget {
@@ -114,62 +117,76 @@ class MyFollowingPage extends StatelessWidget {
 }
 
 Widget FollowItem(UserFriendEntity item) {
-  return Row(
-    children: [
-      Stack(
-        children: [
-          AppImage(
-            '${item.icon}',
-            width: 48.r,
-            height: 48.r,
-          ),
-          Positioned(
-            top: 2.r,
-            right: 4.r,
-            child: Container(
-              width: 8.r,
-              height: 8.r,
-              decoration: BoxDecoration(
-                color: item.status == 1 ? Colors.green : AppGender.female.color,
-                borderRadius: BorderRadius.circular(4.r),
-              ),
-            ),
-          )
-        ],
-      ),
-      Gap(10.w),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  return GestureDetector(
+    onTap: () {
+      Get.toNamed(AppPath.chat,
+          arguments: AppUserConversationModel(
+              nimUser: NIMUser(avatar: item.icon, nick: item.nickname),
+              session: NIMSession(
+                sessionId: '${item.yxAccid}',
+                sessionType: NIMSessionType.p2p,
+                senderNickname: item.nickname,
+              )),
+          preventDuplicates: false);
+    },
+    child: Row(
+      children: [
+        Stack(
           children: [
-            Text(
-              '${item.nickname}',
-              style: TextStyle(
-                fontSize: 14.sp,
-              ),
+            AppImage(
+              '${item.icon}',
+              width: 48.r,
+              height: 48.r,
             ),
-            Gap(2.h),
-            Text(
-              'Tx Male',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: const Color(0xFF959595),
+            Positioned(
+              top: 2.r,
+              right: 4.r,
+              child: Container(
+                width: 8.r,
+                height: 8.r,
+                decoration: BoxDecoration(
+                  color:
+                      item.status == 1 ? Colors.green : AppGender.female.color,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
               ),
             )
           ],
         ),
-      ),
-      Image.asset(
-        AppIcon.followingLive.uri,
-        width: 28.r,
-        height: 28.r,
-      ),
-      Gap(18.w),
-      Image.asset(
-        AppIcon.anchorLike.uri,
-        width: 28.r,
-        height: 28.r,
-      ),
-    ],
+        Gap(10.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${item.nickname}',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
+              ),
+              Gap(2.h),
+              Text(
+                'Tx Male',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: const Color(0xFF959595),
+                ),
+              )
+            ],
+          ),
+        ),
+        Image.asset(
+          AppIcon.followingLive.uri,
+          width: 28.r,
+          height: 28.r,
+        ),
+        Gap(18.w),
+        Image.asset(
+          AppIcon.anchorLike.uri,
+          width: 28.r,
+          height: 28.r,
+        ),
+      ],
+    ),
   );
 }

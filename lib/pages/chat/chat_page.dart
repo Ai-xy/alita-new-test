@@ -2,7 +2,7 @@ import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/kit/app_date_time_kit.dart';
 import 'package:alita/pages/chat/chat_controller.dart';
-import 'package:alita/pages/chat/widgets/chat_bottom_input_field.dart';
+import 'package:alita/pages/chat/widgets/chat_bottom_input_field/chat_bottom_input_field.dart';
 import 'package:alita/pages/chat/widgets/chat_message_card.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/log.dart';
@@ -52,12 +52,16 @@ class ChatPage extends StatelessWidget {
               separatorBuilder: (BuildContext context, int i) {
                 final NIMMessage message = _.messageList.reversed.elementAt(i);
                 final int timestamp = message.timestamp == 0
-                    ? DateTime.now().millisecondsSinceEpoch
+                    ? DateTime.now().microsecond
                     : message.timestamp;
 
                 final bool showTime = i == _.messageList.length - 1
                     ? true
-                    : (((timestamp - _.messageList[i + 1].timestamp)).abs() >
+                    : (((timestamp -
+                                    _.messageList.reversed
+                                        .elementAt(i + 1)
+                                        .timestamp))
+                                .abs() >
                             5 * 60 * 1000)
                         ? true
                         : false;
@@ -65,16 +69,17 @@ class ChatPage extends StatelessWidget {
                     ? const SizedBox.shrink()
                     : Center(
                         child: Container(
-                          constraints: BoxConstraints(maxWidth: 68.w),
+                          constraints: BoxConstraints(maxWidth: 88.w),
                           height: 18.h,
-                          margin: EdgeInsets.symmetric(vertical: 32.w),
+                          margin: EdgeInsets.only(top: 32.w),
                           decoration: BoxDecoration(
                               color: const Color(0xFF646363).withOpacity(.11),
                               borderRadius: BorderRadius.circular(9.r)),
                           alignment: Alignment.center,
                           child: Text(
-                            formdatDateTime(
-                                DateTime.fromMillisecondsSinceEpoch(timestamp)),
+                            _.timeFormat(timestamp),
+                            // formdatDateTime(
+                            //     DateTime.fromMillisecondsSinceEpoch(timestamp)),
                             style: TextStyle(
                               color: const Color(0xFF959595),
                               fontSize: 14.sp,
@@ -90,6 +95,7 @@ class ChatPage extends StatelessWidget {
                 Log.d(message.toMap().toString());
                 final bool isMe = message.fromAccount == _.yxAccid;
                 return ChatMessageCard(
+                    controller: _,
                     isMe: isMe,
                     avatar: isMe
                         ? '${_.user?.icon}'

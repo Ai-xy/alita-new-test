@@ -5,6 +5,6 @@ import 'anchor_profile_controller.dart';
 class AnchorProfileBinding extends Bindings {
   @override
   void dependencies() {
-    // Get.lazyPut(() => AnchorProfileController());
+    Get.lazyPut(() => AnchorProfileController(Get.arguments));
   }
 }

@@ -1,5 +1,6 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/model/ui/app_conversation_model.dart';
+import 'package:alita/pages/live_room/sheets/live_anchor_sheet/live_anchor_sheet.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/widgets/app_chatroom/app_chatroom_controller.dart';
@@ -44,21 +45,27 @@ class AppChatRoomMessageBox<T extends AppChatRoomController>
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.toNamed(AppPath.chat,
-                            arguments: AppUserConversationModel(
-                                nimUser: NIMUser(
-                                    avatar: message.extension?.avatar,
-                                    nick: message.extension?.nickname),
-                                session: NIMSession(
-                                  sessionId: '${message.fromAccount}',
-                                  sessionType: NIMSessionType.p2p,
-                                  senderNickname: message.extension?.nickname,
-                                )),
-                            preventDuplicates: false);
+                        /// 点击直播间发送消息的用户信息
+                        Get.bottomSheet(LiveAnchorSheet(
+                          liveRoom: _.liveRoom,
+                          userId: message.remoteExtension?['userId'],
+                        ));
+                        // Get.toNamed(AppPath.chat,
+                        //     arguments: AppUserConversationModel(
+                        //         nimUser: NIMUser(
+                        //             avatar: message.remoteExtension?['avatar'],
+                        //             nick: message.remoteExtension?['nickname']),
+                        //         session: NIMSession(
+                        //           sessionId: '${message.fromAccount}',
+                        //           sessionType: NIMSessionType.p2p,
+                        //           senderNickname:
+                        //               message.remoteExtension?['nickname'],
+                        //         )),
+                        //     preventDuplicates: false);
                       },
                       behavior: HitTestBehavior.opaque,
                       child: AppImage(
-                        '${message.extension?.avatar}',
+                        '${message.remoteExtension?['avatar']}',
                         width: 32.r,
                         height: 32.r,
                         fit: BoxFit.cover,

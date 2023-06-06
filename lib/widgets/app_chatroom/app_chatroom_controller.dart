@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/kit/app_nim_kit.dart';
 import 'package:alita/model/api/live_room_model.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
@@ -19,6 +21,8 @@ abstract class AppChatRoomController extends BaseAppController {
   RxList<NIMChatroomMessage> messageList = <NIMChatroomMessage>[].obs;
   List<NIMChatroomMember> chatroomMemberList = [];
 
+  static ChatroomService? chatroomService;
+
   ///直播间关注数量
   RxInt memberNum = 0.obs;
   StreamSubscription<List<NIMChatroomMessage>>? _messageReceivedSubscription;
@@ -26,13 +30,36 @@ abstract class AppChatRoomController extends BaseAppController {
 
   ScrollController messageListScrollController = ScrollController();
 
-  Future sendMessage(String text) {
-    return AppNimKit.instance
-        .sendChatRoomTextMessage(text: text, roomId: yxRoomId)
-        .then((value) {
-      if (value == null) return;
-      _addMessage(value);
+  /// 发送直播间消息
+  Future sendMessage(String text) async {
+    ChatroomMessageBuilder.createChatroomTextMessage(
+            roomId: yxRoomId, text: text)
+        .then<NIMResult>((value) async {
+      if (value.isSuccess) {
+        value.data!.enableHistory = false;
+        value.data!.remoteExtension = {
+          'avatar': user?.icon,
+          'userId': user?.userId,
+          'nickname': user?.nickname,
+        };
+        return chatroomService!.sendChatroomMessage(value.data!);
+      } else {
+        return value;
+      }
+    }).then((value) {
+      if (value.isSuccess) {
+        _addMessage(value.data);
+        update();
+      } else {
+        AppToast.alert(message: 'send fail');
+      }
     });
+    // return AppNimKit.instance
+    //     .sendChatRoomTextMessage(text: text, roomId: yxRoomId)
+    //     .then((value) {
+    //   if (value == null) return;
+    //   _addMessage(value);
+    // });
   }
 
   void _addMessage(NIMChatroomMessage message) {
@@ -40,6 +67,7 @@ abstract class AppChatRoomController extends BaseAppController {
     scrollToBottom();
   }
 
+  /// 刷新直播间信息
   Future _refreshRoomInfo() {
     return NimCore.instance.chatroomService
         .fetchChatroomInfo(yxRoomId)
@@ -52,9 +80,10 @@ abstract class AppChatRoomController extends BaseAppController {
               roomId: yxRoomId,
               queryType:
                   NIMChatroomMemberQueryType.onlineGuestMemberByEnterTimeAsc,
-              limit: 3)
+              limit: 30)
           .then((value) {
         chatroomMemberList = value.data ?? [];
+        update();
         for (NIMChatroomMember item in chatroomMemberList) {
           Log.i('直播间成员${item.nickname}');
         }
@@ -89,9 +118,19 @@ abstract class AppChatRoomController extends BaseAppController {
     _listenLiveRoomState();
     return AppNimKit.instance
         .enterChatRoom(
-            yxRoomId: yxRoomId, nickname: userNickname, avatar: userAvatar)
+            userId: userId,
+            yxRoomId: yxRoomId,
+            nickname: userNickname,
+            avatar: userAvatar,
+            gender: userGender)
         .then((value) {
-      return _refreshRoomInfo();
+      if (value == false) {
+        AppToast.alert(message: 'You have been blacklisted');
+        Get.back();
+      } else {
+        chatroomService ??= NimCore.instance.chatroomService;
+        return _refreshRoomInfo();
+      }
     }).then((value) {
       return _fetchMessageHistory();
     });
@@ -99,6 +138,30 @@ abstract class AppChatRoomController extends BaseAppController {
 
   void _onEventNotified(NIMChatroomEvent event) {
     Log.i('直播间状态变化$event');
+    // 如果被踢出,则退出房间
+    if (event is NIMChatroomKickOutEvent) {
+      switch (event.reason) {
+        case NIMChatroomKickOutReason.unknown:
+          AppToast.alert(message: 'Unknown');
+          break;
+        case NIMChatroomKickOutReason.dismissed:
+          AppToast.alert(message: 'The chat room has been disbanded');
+          break;
+        case NIMChatroomKickOutReason.byManager:
+          AppToast.alert(message: 'You have been kicked out by the homeowner');
+          break;
+        case NIMChatroomKickOutReason.byConflictLogin:
+          AppToast.alert(message: 'Kicked out by the other end');
+          break;
+        case NIMChatroomKickOutReason.blacklisted:
+          AppToast.alert(message: 'You have been blocked');
+          break;
+      }
+      onExitChatRoom().then((value) {
+        // 回到home页
+        Get.offNamedUntil(AppPath.home, ModalRoute.withName('/'));
+      });
+    }
   }
 
   void _handleMemberInOrOut() {
@@ -116,6 +179,28 @@ abstract class AppChatRoomController extends BaseAppController {
           (item.content == null || item.content?.isEmpty != true)) {
         _addMessage(item);
       }
+
+      if (item.messageType == NIMMessageType.notification &&
+          item.messageAttachment != null) {
+        final notificationInfo =
+            item.messageAttachment as NIMChatroomNotificationAttachment;
+
+        // 收到被禁言通知
+        if (notificationInfo.type ==
+            NIMChatroomNotificationTypes.chatRoomMemberMuteAdd) {
+          Map<String, dynamic>? info = notificationInfo.extension;
+          AppToast.alert(
+              message:
+                  'You have been silenced for ${info?['duration']} seconds');
+        }
+
+        // if (item.messageAttachment?.toMap()['duration'] != null) {
+        //   Map<String, dynamic>? info = item.messageAttachment?.toMap();
+        //   AppToast.alert(
+        //       message:
+        //           'You have been silenced for ${info?['duration']} seconds');
+        // }
+      }
     }
   }
 
@@ -127,7 +212,7 @@ abstract class AppChatRoomController extends BaseAppController {
         .listen(_onMessageReceived);
   }
 
-  void onExitChatRoom() {
+  Future onExitChatRoom() async {
     memberNum.close();
     messageList.close();
     messageListScrollController.dispose();

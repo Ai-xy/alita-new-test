@@ -4,9 +4,11 @@ import 'package:alita/config/app_config.dart';
 import 'package:alita/enum/app_live_room_type.dart';
 import 'package:alita/kit/app_media_kit.dart';
 import 'package:alita/mixins/app_live_binding.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/pages/my_live_room/my_live_room_binding.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:get/get.dart';
 import 'package:rtmp_broadcaster/camera.dart';
@@ -65,10 +67,18 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
       userId: user?.userId ?? 0,
       userNickname: user?.nickname ?? '',
     ).then((value) {
+      Log.d('创建的房间信息 ${value.toJson()}');
       if (cameraController?.value.isInitialized != true) {}
+      LiveRoomModel liveRoomInfo = LiveRoomModel();
+      liveRoomInfo = value;
+      liveRoomInfo.homeownerId = user?.userId;
+      liveRoomInfo.homeownerNickname = user?.nickname;
+      liveRoomInfo.homeownerIcon = user?.icon;
+      liveRoomInfo.liveRoomName = 'test';
+      Log.d('附加信息${liveRoomInfo.toJson().toString()}');
       return Get.toNamed(AppPath.myLiveRoom,
           arguments: MyLiveRoomConfigArgument(
-              cameraController: cameraController!, liveRoom: value));
+              cameraController: cameraController!, liveRoom: liveRoomInfo));
     });
   }
 

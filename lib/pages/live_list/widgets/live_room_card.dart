@@ -97,6 +97,20 @@ class LiveRoomCard extends StatelessWidget {
     // Get.toNamed(AppPath.anchorLiveEnd,
     //     preventDuplicates: false, arguments: liveRoom);
 
+    ///
+    // if (PictureInPicture.isActive) {
+    //   PictureInPicture.stopPiP();
+    // }
+    // CancelFunc cancelFunc = AppToast.loading();
+    // LiveApi.getLiveStream(
+    //         id: liveRoom.id ?? 0, password: '${liveRoom.password}')
+    //     .then((value) {
+    //   print('value值');
+    //   print(value);
+    //   Get.toNamed(AppPath.liveRoom,
+    //       arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
+    //       preventDuplicates: false);
+    // }).whenComplete(cancelFunc);
     if (PictureInPicture.isActive) {
       PictureInPicture.stopPiP();
     }
@@ -106,10 +120,17 @@ class LiveRoomCard extends StatelessWidget {
         .then((value) {
       print('value值');
       print(value);
-      Get.toNamed(AppPath.liveRoom,
-          arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
-          preventDuplicates: false);
+      if (liveRoom.liveState == 2) {
+        Get.toNamed(AppPath.liveRoom,
+            arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
+            preventDuplicates: false);
+      } else {
+        Get.toNamed(AppPath.anchorLiveEnd,
+            preventDuplicates: false, arguments: liveRoom);
+      }
     }).whenComplete(cancelFunc);
+
+
     return;
   }
 

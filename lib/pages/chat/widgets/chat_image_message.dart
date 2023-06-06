@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:alita/model/ui/app_gallery_model.dart';
+import 'package:alita/pages/photo_viewer/photo_viewer_page.dart';
+import 'package:alita/widgets/app_image.dart';
 import 'package:alita/widgets/app_percent_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -46,10 +49,36 @@ class ChatImageMessageCard extends StatelessWidget {
                         children: [
                           message.messageDirection ==
                                   NIMMessageDirection.outgoing
-                              ? Image.file(
-                                  File('${image.path}'),
-                                  fit: BoxFit.fill,
+                              ? GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => PhotoViewPage(
+                                        imageList: ([image.url])
+                                            .map((e) => AppGalleryImageModel(
+                                                tag: '${image.url}',
+                                                url: '${image.url}'))
+                                            .toList(),
+                                      ),
+                                    ));
+                                  },
+                                  child: Hero(
+                                      tag: '${image.url}',
+                                      child: AppImage(
+                                        '${image.url}',
+                                        fit: BoxFit.fill,
+                                      )
+                                      //   Image.file(
+                                      //   File('${image.path}'),
+                                      //   fit: BoxFit.fill,
+                                      // ),
+                                      ),
                                 )
+                              // Image.file(
+                              //           File('${image.path}'),
+                              //           fit: BoxFit.fill,
+                              //         )
                               : ProgressiveImage(
                                   // size: 1.87KB
                                   thumbnail: NetworkImage('${image.thumbUrl}'),

@@ -4,9 +4,11 @@ import 'package:alita/R/app_text_style.dart';
 import 'package:alita/api/live_api.dart';
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/model/api/gift_model.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/widgets/app_button.dart';
 import 'package:alita/widgets/app_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,7 +17,19 @@ import 'package:get/get.dart';
 
 class _LiveGiftController extends BaseAppController {
   List<GiftModel> giftList = [];
-
+  int selectedGiftNum = 1;
+  final List<String> giftNumItems = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10'
+  ];
   GiftModel selectedGift = GiftModel();
 
   @override
@@ -33,10 +47,21 @@ class _LiveGiftController extends BaseAppController {
     selectedGift = gift;
     update();
   }
+
+  void selectGiftNum(int num) {
+    selectedGiftNum = num;
+    update();
+  }
+
+  // 送礼
+  void sendGift(int targetUserID) {
+    LiveApi.sendGift(selectedGift.id!, targetUserID, selectedGiftNum);
+  }
 }
 
 class LiveGiftSheet extends StatelessWidget {
-  const LiveGiftSheet({Key? key}) : super(key: key);
+  final LiveRoomModel? liveRoom;
+  const LiveGiftSheet({Key? key, this.liveRoom}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -148,16 +173,49 @@ class LiveGiftSheet extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Gap(24.w),
-                          const Text('1'),
-                          Gap(14.w),
-                          Image.asset(
-                            AppIcon.downArrow.uri,
-                            width: 16.r,
-                            height: 16.r,
+                          GestureDetector(
+                            onTap: () {
+                              showCupertinoModalPopup(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SizedBox(
+                                    height: 300.w,
+                                    child: CupertinoPicker(
+                                      backgroundColor: Colors.white,
+                                      itemExtent: 50.0,
+                                      onSelectedItemChanged: (int index) {
+                                        _.selectGiftNum(index + 1);
+                                      },
+                                      children: List<Widget>.generate(
+                                          _.giftNumItems.length, (int index) {
+                                        return Center(
+                                          child: Text(_.giftNumItems[index]),
+                                        );
+                                      }),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Gap(24.w),
+                                Text('${_.selectedGiftNum}'),
+                                Gap(14.w),
+                                Image.asset(
+                                  AppIcon.downArrow.uri,
+                                  width: 16.r,
+                                  height: 16.r,
+                                ),
+                                Gap(10.w),
+                              ],
+                            ),
                           ),
-                          Gap(10.w),
                           AppButton(
+                            onTap: () {
+                              //TODO 送礼
+                              _.sendGift(liveRoom!.homeownerId!);
+                            },
                             width: 64.w,
                             height: 34.h,
                             text: AppMessage.send.tr,

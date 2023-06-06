@@ -12,6 +12,7 @@ import 'package:alita/pages/chat/chat_page.dart';
 import 'package:alita/pages/edit_profile/edit_profile_page.dart';
 import 'package:alita/pages/feedback/feedback_binding.dart';
 import 'package:alita/pages/feedback/feedback_page.dart';
+import 'package:alita/pages/follow/create_moments/create_moments_binding.dart';
 import 'package:alita/pages/forget_password/forget_password_binding.dart';
 import 'package:alita/pages/forget_password/forget_password_page.dart';
 import 'package:alita/pages/home/home_binding.dart';
@@ -44,6 +45,7 @@ import 'package:alita/pages/wallet/wallet_binding.dart';
 import 'package:alita/pages/wallet/wallet_page.dart';
 import 'package:get/get.dart';
 
+import '../pages/follow/create_moments/create_moments_view.dart';
 import 'app_path.dart';
 import 'middlewares/auth_middleware.dart';
 
@@ -163,6 +165,11 @@ abstract class AppRouter {
       name: AppPath.anchorProfile,
       binding: AnchorProfileBinding(),
       page: () => const AnchorProfilePage(),
+    ),
+    GetPage(
+      name: AppPath.addMoments,
+      page: () => const CreateMomentsView(),
+      binding: CreateMomentsBinding(),
     ),
   ];
 }

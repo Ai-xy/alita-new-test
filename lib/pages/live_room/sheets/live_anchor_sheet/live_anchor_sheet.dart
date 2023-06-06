@@ -10,6 +10,7 @@ import 'package:alita/pages/home/country_service.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_bottom_sheet.dart';
 import 'package:alita/widgets/app_button.dart';
 import 'package:alita/widgets/app_image.dart';
@@ -42,16 +43,24 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
       builder: (_) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Gap(24.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Image.asset(
-                  AppIcon.anchorReport.uri,
-                  width: 20.r,
-                  height: 20.r,
-                ),
+                _.isMe
+                    ? Container()
+                    : GestureDetector(
+                        onTap: () {
+                          _showDialog(_);
+                        },
+                        child: Image.asset(
+                          AppIcon.anchorReport.uri,
+                          width: 20.r,
+                          height: 20.r,
+                        ),
+                      ),
                 Gap(27.w),
               ],
             ),
@@ -172,61 +181,232 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
               ),
             ),
             Gap(18.h),
+
+            /// 拉黑、禁言、踢出房间
             Container(
               margin: EdgeInsets.symmetric(horizontal: 42.w),
-              child: _.user?.userId == liveRoom?.homeownerId
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        for (AppLiveActionModel action in [
-                          AppLiveActionModel(
-                              icon: AppIcon.userBlock.uri, label: ''),
-                          AppLiveActionModel(
-                              icon: AppIcon.userFollow.uri, label: ''),
-                          AppLiveActionModel(
-                              icon: AppIcon.userMute.uri, label: '')
-                        ])
-                          Image.asset(
-                            action.icon,
-                            width: 48.r,
-                            height: 48.r,
-                          )
-                      ],
-                    )
-                  : Container(),
+              child: _.isMe
+                  ? Container()
+                  : _.user?.userId == liveRoom?.homeownerId
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            for (AppLiveActionModel action in [
+                              AppLiveActionModel(
+                                  icon: AppIcon.userBlock.uri,
+                                  label: '',
+                                  onTap: () {
+                                    _
+                                        .blockUser(true)
+                                        .then((value) => Get.back());
+                                  }),
+                              AppLiveActionModel(
+                                  icon: AppIcon.userMute.uri,
+                                  label: '',
+                                  onTap: () {
+                                    _
+                                        .muteAnchorTemp()
+                                        .then((value) => Get.back());
+                                  }),
+                              AppLiveActionModel(
+                                  icon: AppIcon.userFollow.uri,
+                                  label: '',
+                                  onTap: () {
+                                    _
+                                        .kickOutAnchor()
+                                        .then((value) => Get.back());
+                                  }),
+                            ])
+                              GestureDetector(
+                                onTap: action.onTap,
+                                child: Image.asset(
+                                  action.icon,
+                                  width: 48.r,
+                                  height: 48.r,
+                                ),
+                              )
+                          ],
+                        )
+                      : Container(),
+              // child: _.user?.userId == liveRoom?.homeownerId
+              //     ? _.isMe
+              //         ? Container()
+              //         : Row(
+              //             mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //             children: [
+              //               for (AppLiveActionModel action in [
+              //                 AppLiveActionModel(
+              //                     icon: AppIcon.userBlock.uri,
+              //                     label: '',
+              //                     onTap: () {
+              //                       _
+              //                           .blockUser(true)
+              //                           .then((value) => Get.back());
+              //                     }),
+              //                 AppLiveActionModel(
+              //                     icon: AppIcon.userMute.uri,
+              //                     label: '',
+              //                     onTap: () {
+              //                       _
+              //                           .muteAnchorTemp()
+              //                           .then((value) => Get.back());
+              //                     }),
+              //                 AppLiveActionModel(
+              //                     icon: AppIcon.userFollow.uri,
+              //                     label: '',
+              //                     onTap: () {
+              //                       _
+              //                           .kickOutAnchor()
+              //                           .then((value) => Get.back());
+              //                     }),
+              //               ])
+              //                 GestureDetector(
+              //                   onTap: action.onTap,
+              //                   child: Image.asset(
+              //                     action.icon,
+              //                     width: 48.r,
+              //                     height: 48.r,
+              //                   ),
+              //                 )
+              //             ],
+              //           )
+              //     : Container(),
             ),
-            Gap(36.h),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Row(
+            Gap(24.h),
+            _.isMe
+                ? Container()
+                : Container(
+                    margin:
+                        EdgeInsets.only(left: 16.w, right: 16.w, bottom: 23.w),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AppButton(
+                            onTap: () {
+                              _.isFollowed
+                                  ? AppToast.alert(
+                                      message: 'You\'re already friends')
+                                  : _.follow();
+                            },
+                            text: ' Follow',
+                            textStyle: TextStyle(
+                                color: const Color.fromRGBO(254, 166, 35, 1),
+                                fontSize: 16.sp),
+                            color: AppColor.accentColor.withOpacity(.39),
+                            withIcon: true,
+                            icon: Image.asset(
+                              AppIcon.anchorFollow.uri,
+                              width: 20.r,
+                              height: 20.r,
+                            ),
+                          ),
+                        ),
+                        Gap(24.w),
+                        Expanded(
+                          child: AppButton(
+                            text: ' HomePage',
+                            onTap: () {
+                              Get.toNamed(AppPath.anchorProfile,
+                                  arguments: _.liveRoomUser);
+                            },
+                            withIcon: true,
+                            icon: Image.asset(
+                              AppIcon.home.uri,
+                              width: 20.r,
+                              height: 20.r,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+          ],
+        );
+      },
+    ));
+  }
+
+  void _showDialog(LiveAnchorSheetController controller) {
+    Get.dialog(Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Center(
+            child: Container(
+              margin: EdgeInsets.only(left: 20.w, right: 20.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20).r,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: AppButton(
-                      text: 'Follow',
-                      color: AppColor.accentColor.withOpacity(.39),
-                      withIcon: true,
-                      icon: Image.asset(
-                        AppIcon.anchorFollow.uri,
-                        width: 20.r,
-                        height: 20.r,
-                      ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(47.w, 38.w, 47.w, 40.w),
+                    child: Text(
+                      'Do you want to report this user?',
+                      style: TextStyle(
+                          color: const Color.fromRGBO(51, 51, 51, 1),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  Gap(24.w),
-                  Expanded(
-                    child: AppButton(
-                      text: 'HomePage',
-                      onTap: () {
-                        Get.toNamed(AppPath.anchorProfile);
-                      },
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 40.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(236, 236, 237, 1),
+                              borderRadius: BorderRadius.circular(24.w),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12.w, horizontal: 40.w),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: const Color.fromRGBO(32, 32, 32, .5),
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Gap(14.w),
+                        GestureDetector(
+                          onTap: () {
+                            controller.reportAuthor();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(254, 166, 35, 1),
+                              borderRadius: BorderRadius.circular(20.w),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12.w, horizontal: 40.w),
+                            child: Text(
+                              'Confirm',
+                              style: TextStyle(
+                                color: const Color.fromRGBO(255, 255, 255, 1),
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 ],
               ),
-            )
-          ],
-        );
-      },
+            ),
+          )
+        ],
+      ),
     ));
   }
 }

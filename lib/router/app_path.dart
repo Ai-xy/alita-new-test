@@ -23,5 +23,6 @@ abstract class AppPath {
   static const String liveStreamEnd = '/liveStreamEnd';
   static const String anchorProfile = '/anchorProfile';
   static const String liveAnchorSheet = '/liveAnchorSheet';
+  static const String addMoments = '/addMoments';
 
 }

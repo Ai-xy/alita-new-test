@@ -1,8 +1,12 @@
 import 'package:alita/enum/app_gender.dart';
 import 'package:alita/generated/json/base/json_convert_content.dart';
 import 'package:alita/http/http.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/user_friend_entity.dart';
 import 'package:alita/model/api/user_profile_model.dart';
+import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
+import 'package:get/get.dart';
 
 abstract class UserApi {
   static Future<UserProfileModel> getUserInfo() {
@@ -14,12 +18,13 @@ abstract class UserApi {
   }
 
   // 查询用户信息
-  static Future<UserProfileModel> getUserDetail({int? userId, String? yxId}) {
+  static Future getUserDetail({int? userId, String? yxId}) {
     return Http.instance
         .post(ApiRequest('/api/index/getUserDetail',
             formData: {"userId": userId, "yxAccid": yxId}))
         .then((value) {
-      return UserProfileModel.fromJson(value.data);
+      //return UserProfileModel.fromJson(value.data);
+      return value;
     });
   }
 
@@ -60,7 +65,14 @@ abstract class UserApi {
   }
 
   static Future getMyLiveRoom() {
-    return Http.instance.post(ApiRequest('/api/expand/wearLive/queryLiveRoom'));
+    return Http.instance
+        .post(ApiRequest('/api/expand/wearLive/queryLiveRoom'))
+        .then((value) {
+      LiveRoomModel model = LiveRoomModel();
+      model = LiveRoomModel.fromJson(value.data);
+      Log.d('我的房间信息${model.toJson()}');
+      return model;
+    });
   }
 
   static Future saveUserInfo({
@@ -93,15 +105,24 @@ abstract class UserApi {
       'pics': imageList
     }))
         .then((value) {
-      return UserProfileModel.fromJson(value.data);
+      AppToast.alert(message: '${value.code}');
+
+      if (value.code == '1001') {
+        AppToast.alert(message: '请检查邮箱格式是否正确');
+      }
+      //return UserProfileModel.fromJson(value.data);
     });
   }
 
   static Future followUser({required int userId}) {
-    return Http.instance.post(ApiRequest('/api/user/followUser', formData: {
+    return Http.instance
+        .post(ApiRequest('/api/user/followUser', formData: {
       'followType': 1,
       'followUserId': userId,
-    }));
+    }))
+        .then((value) {
+      AppToast.alert(message: '${value.message}');
+    });
   }
 
   static Future unfollowUser({required int userId}) {
@@ -146,5 +167,47 @@ abstract class UserApi {
       if (transactionId != null) 'transactionId': transactionId,
       if (type != null) 'type': type,
     }));
+  }
+
+  /// 4 拉黑
+  static Future bindUserRoomRelation(int type, int roomId, int userId) {
+    return Http.instance
+        .post(ApiRequest('/api/voicechat/room/bindUserRoomRelation', formData: {
+      {"relationType": type, "roomId": roomId, "userId": userId}
+    }));
+  }
+
+  /// 解绑
+  static Future unBindUserRoomRelation(int type, int roomId, int userId) {
+    return Http.instance
+        .post(
+            ApiRequest('/api/voicechat/room/unbindUserRoomRelation', formData: {
+      {"relationType": type, "roomId": roomId, "userId": userId}
+    }))
+        .then((value) {
+      //return UserProfileModel.fromJson(value.data);
+      return value;
+    });
+  }
+
+  // 举报用户
+  static Future reportAuthor(int userId) {
+    return Http.instance
+        .post(ApiRequest('/api/feedback/feedbackVideo', formData: {
+      "beBlockUid": userId,
+      "block": 2,
+      "feedbackType": "AD",
+      "suggestion": "辣鸡主播",
+      "url": ""
+    }))
+        .then((value) {
+      if (value.code == '0000') {
+        AppToast.alert(message: 'Successfully reported');
+        Get.back();
+      } else {
+        AppToast.alert(message: '${value.message}');
+        Get.back();
+      }
+    });
   }
 }

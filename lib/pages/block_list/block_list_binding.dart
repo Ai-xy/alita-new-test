@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 class BlockListBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => BlockListController());
+    final argument = Get.arguments;
+    Get.lazyPut(() => BlockListController(liveRoom: argument));
   }
 }

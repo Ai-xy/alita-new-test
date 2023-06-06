@@ -51,7 +51,9 @@ class AppChatRoomActionBar<T extends AppChatRoomController>
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                Get.bottomSheet(const LiveGiftSheet());
+                Get.bottomSheet(LiveGiftSheet(
+                  liveRoom: _.liveRoom,
+                ));
               },
               child: Image.asset(
                 AppIcon.liveGift.uri,

@@ -1,9 +1,18 @@
+import 'dart:typed_data';
+
+import 'package:alita/api/user_api.dart';
 import 'package:alita/kit/app_permission_kit.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_chatroom/app_chatroom_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_screen_recording/flutter_screen_recording.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rtmp_broadcaster/camera.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:wakelock/wakelock.dart';
 import 'my_live_room_binding.dart';
 
@@ -12,8 +21,12 @@ class MyLiveRoomController extends AppChatRoomController
   MyLiveRoomController({required MyLiveRoomConfigArgument argument})
       : cameraController = argument.cameraController,
         super(liveRoom: argument.liveRoom);
-
   CameraController? cameraController;
+
+  // 屏幕截屏
+  ScreenshotController screenshotController = ScreenshotController();
+  // 截下的图
+  Uint8List? screenShotImage;
 
   Future flipCamera() {
     if (cameraController == null) {
@@ -87,10 +100,10 @@ class MyLiveRoomController extends AppChatRoomController
   void onInit() {
     Wakelock.enable();
     WidgetsBinding.instance.addObserver(this);
+    onEnterRoom();
     Future.delayed(const Duration(seconds: 3), () {
       cameraController?.startVideoStreaming(streamUrl);
     });
-
     super.onInit();
   }
 
@@ -100,5 +113,54 @@ class MyLiveRoomController extends AppChatRoomController
     Wakelock.disable();
     cameraController?.stopVideoStreaming();
     super.onClose();
+  }
+
+  saveScreenshot(BuildContext context) async {
+    try {
+      Uint8List? imageBytes = await screenshotController.capture();
+
+      await ImageGallerySaver.saveImage(imageBytes!);
+
+      AppToast.alert(message: 'Screenshot saved to gallery!');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  bool isRecording = false;
+  String? videoPath;
+
+  void startRecording() async {
+    try {
+      await FlutterScreenRecording.startRecordScreen('alita_record');
+      isRecording = true;
+      update();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void stopRecording() async {
+    try {
+      String path = await FlutterScreenRecording.stopRecordScreen;
+      isRecording = false;
+      videoPath = path;
+      update();
+      _saveToGallery(path).then((value) {
+        AppToast.alert(
+            message:
+                'Screen recording has been successfully saved to the album');
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  /// 保存至相册
+  Future<void> _saveToGallery(String path) async {
+    if (await Permission.storage.request().isGranted) {
+      var file = await DefaultCacheManager().getSingleFile(path);
+      await ImageGallerySaver.saveFile(file.path);
+    }
   }
 }

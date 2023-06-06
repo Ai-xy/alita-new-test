@@ -2,6 +2,7 @@ import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/pages/live_room/sheets/live_anchor_sheet/live_anchor_sheet.dart';
 import 'package:alita/pages/live_room/sheets/live_watcher_sheet.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_chatroom/app_chatroom_controller.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,8 @@ class AppChatRoomWatcherTile<T extends AppChatRoomController>
                 ],
               ),
             ),
+
+            /// 直播间在线观众列表
             Expanded(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -107,10 +110,14 @@ class AppChatRoomWatcherTile<T extends AppChatRoomController>
                 if (_.chatroomMemberList.isNotEmpty)
                   GestureDetector(
                     onTap: () {
-                      Get.bottomSheet(LiveWatcherSheet(
-                        memberList: _.chatroomMemberList,
-                        count: _.memberNum.value,
-                      ));
+                      Get.bottomSheet(
+                          LiveWatcherSheet(
+                            liveRoom: _.liveRoom,
+                            memberList: _.chatroomMemberList,
+                            count: _.memberNum.value,
+                          ),
+                          isDismissible: false,
+                          enableDrag: false);
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Container(
