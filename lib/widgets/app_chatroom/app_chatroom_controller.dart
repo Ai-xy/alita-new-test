@@ -31,7 +31,7 @@ abstract class AppChatRoomController extends BaseAppController {
   ScrollController messageListScrollController = ScrollController();
 
   /// 发送直播间消息
-  Future sendMessage(String text) async {
+  Future sendMessage(String text, {String? giftUrl, String? giftNum}) async {
     ChatroomMessageBuilder.createChatroomTextMessage(
             roomId: yxRoomId, text: text)
         .then<NIMResult>((value) async {
@@ -41,13 +41,18 @@ abstract class AppChatRoomController extends BaseAppController {
           'avatar': user?.icon,
           'userId': user?.userId,
           'nickname': user?.nickname,
+          'giftUrl': giftUrl,
+          'giftNum': giftNum,
         };
+        print('createChatroomTextMessage返回 ${value.toMap().toString()}');
         return chatroomService!.sendChatroomMessage(value.data!);
       } else {
+        print('createChatroomTextMessage返回 下卖弄');
         return value;
       }
     }).then((value) {
       if (value.isSuccess) {
+        print('createChatroomTextMessage之后返回 ${value.toMap().toString()}');
         _addMessage(value.data);
         update();
       } else {
@@ -62,9 +67,81 @@ abstract class AppChatRoomController extends BaseAppController {
     // });
   }
 
+  /// 发送直播间送礼消息
+  Future sendGiftMessage(String text,
+      {String? giftUrl, String? giftNum}) async {
+    ChatroomMessageBuilder.createChatroomTextMessage(
+            roomId: yxRoomId, text: text)
+        .then<NIMResult>((value) async {
+      if (value.isSuccess) {
+        value.data!.enableHistory = false;
+        value.data!.remoteExtension = {
+          'avatar': user?.icon,
+          'userId': user?.userId,
+          'nickname': user?.nickname,
+          'giftUrl': giftUrl,
+          'giftNum': giftNum,
+        };
+        print('createChatroomTextMessage返回 ${value.toMap().toString()}');
+        return chatroomService!.sendChatroomMessage(value.data!);
+      } else {
+        print('createChatroomTextMessage返回 下卖弄');
+        return value;
+      }
+    }).then((value) {
+      if (value.isSuccess) {
+        print('createChatroomTextMessage之后返回 ${value.toMap().toString()}');
+        _addMessage(value.data);
+        update();
+      } else {
+        AppToast.alert(message: 'send fail');
+      }
+    });
+    // return AppNimKit.instance
+    //     .sendChatRoomTextMessage(text: text, roomId: yxRoomId)
+    //     .then((value) {
+    //   if (value == null) return;
+    //   _addMessage(value);
+    // });
+  }
+
+  // Future sendCustomMessage(String giftUrl) async {
+  //   print('发送自定义消息$giftUrl');
+  //   return ChatroomMessageBuilder.createChatroomCustomMessage(
+  //           roomId: yxRoomId,
+  //           attachment: NIMMessageAttachment.fromJson({'giftUrl': giftUrl}))
+  //       .then<NIMResult>((value) async {
+  //     print('创建的礼物信息');
+  //     print(value.toMap());
+  //     if (value.isSuccess) {
+  //       value.data!.enableHistory = false;
+  //       value.data!.remoteExtension = {
+  //         'avatar': user?.icon,
+  //         'userId': user?.userId,
+  //         'nickname': user?.nickname,
+  //       };
+  //       return chatroomService!.sendChatroomCustomMessage(roomId: yxRoomId);
+  //     } else {
+  //       return value;
+  //     }
+  //   }).then((value) {
+  //     if (value.isSuccess) {
+  //       print('创建的礼物信息下一步是');
+  //       print(value.toMap());
+  //       _addMessage(value.data);
+  //       update();
+  //     } else {
+  //       AppToast.alert(message: 'send fail');
+  //     }
+  //   });
+  // }
+
   void _addMessage(NIMChatroomMessage message) {
+    Log.d(message.toMap().toString(), tag: '添加到消息list');
     messageList.add(message);
-    scrollToBottom();
+    Log.d(messageList.length.toString(), tag: 'messagelist长度');
+    update();
+    //scrollToBottom();
   }
 
   /// 刷新直播间信息
@@ -213,11 +290,17 @@ abstract class AppChatRoomController extends BaseAppController {
   }
 
   Future onExitChatRoom() async {
-    memberNum.close();
-    messageList.close();
-    messageListScrollController.dispose();
-    _eventNotifySubscription?.cancel();
-    _messageReceivedSubscription?.cancel();
+    AppToast.alert(message: '退出房间');
+    memberNum = 0.obs;
+    messageList.clear();
+    //messageListScrollController.dispose();
+    if (_messageReceivedSubscription != null) {
+      _messageReceivedSubscription?.cancel();
+    }
+    if (_eventNotifySubscription != null) {
+      _eventNotifySubscription?.cancel();
+    }
     NimCore.instance.chatroomService.exitChatroom(yxRoomId);
+    Log.d('退出ExitChatRoom', tag: '退出ExitChatRoom');
   }
 }

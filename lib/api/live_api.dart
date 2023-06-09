@@ -110,13 +110,37 @@ abstract class LiveApi {
         formData: {'searchValue': 'gift|follower|duration'}));
   }
 
+  /// 查询其他用户直播间信息
+  static Future queryAuthorLiveRoomInfo(int userId) {
+    return Http.instance
+        .post(ApiRequest('/api/expand/wearLive/queryLiveRoom',
+            formData: {'searchValue': userId}))
+        .then((value) {
+      LiveRoomModel model = LiveRoomModel();
+      model = LiveRoomModel.fromJson(value.data);
+      Log.d('该用户房间信息${model.toJson()}');
+      return model;
+    });
+  }
+
   // 直播间送礼
-  static Future sendGift(int giftId, int targetId, int num) {
-    return Http.instance.post(ApiRequest('/api/expand/wearLive/sendGift',
-        formData: {
-          "giftId": giftId,
-          "receiverUserId": targetId,
-          "sendNum": num
-        }));
+  static Future<bool> sendGift(int giftId, int targetId, int num) {
+    return Http.instance
+        .post(ApiRequest('/api/expand/wearLive/sendGift', formData: {
+      "giftId": giftId,
+      "receiverUserId": targetId,
+      "sendNum": num
+    }))
+        .then((value) {
+      print('sendGift接口回调${value}');
+
+      if (value.code == '0000') {
+        print('xxxtrue');
+        return true;
+      } else {
+        print('xxxfalse');
+        return false;
+      }
+    });
   }
 }

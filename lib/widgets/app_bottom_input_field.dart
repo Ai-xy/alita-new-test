@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:just_throttle_it/just_throttle_it.dart';
 
 class AppBottomInputField extends StatelessWidget {
-  final Function(String)? onSubmitted;
+  final Function(String, {String giftUrl, String giftNum})? onSubmitted;
   const AppBottomInputField({Key? key, this.onSubmitted}) : super(key: key);
 
   @override

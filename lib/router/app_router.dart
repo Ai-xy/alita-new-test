@@ -86,7 +86,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.liveRoom,
-      page: () => const LiveRoomPage(),
+      page: () => LiveRoomPage(),
       binding: LiveRoomBinding(),
     ),
     GetPage(
@@ -96,7 +96,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.editProfile,
-      page: () => const EditProfilePage(),
+      page: () =>  EditProfilePage(),
     ),
     GetPage(
       name: AppPath.setMySignature,
@@ -114,7 +114,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.sessionList,
-      page: () => const SessionListPage(),
+      page: () =>  SessionListPage(),
       binding: SessionListBinding(),
     ),
     GetPage(

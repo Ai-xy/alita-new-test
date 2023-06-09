@@ -4,11 +4,13 @@ import 'package:alita/R/app_text_style.dart';
 import 'package:alita/base/base_app_future_controller.dart';
 import 'package:alita/pages/live_list/live_list_controller.dart';
 import 'package:alita/pages/live_list/widgets/live_room_card.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 
 class LiveListPage extends StatelessWidget {
   const LiveListPage({Key? key}) : super(key: key);
@@ -33,12 +35,17 @@ class LiveListPage extends StatelessWidget {
                           AppMessage.yonoLive.tr,
                           style: AppTextStyle.titleStyle,
                         ),
-                        Transform.scale(
-                          scale: 1.5,
-                          child: Image.asset(
-                            AppIcon.message.uri,
-                            width: 28.r,
-                            height: 28.r,
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(AppPath.sessionList);
+                          },
+                          child: Transform.scale(
+                            scale: 1.5,
+                            child: Image.asset(
+                              AppIcon.message.uri,
+                              width: 28.r,
+                              height: 28.r,
+                            ),
                           ),
                         ),
                       ],
@@ -77,20 +84,26 @@ class LiveListPage extends StatelessWidget {
                   ],
                 ),
               )),
-          body: MasonryGridView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            crossAxisSpacing: 11.w,
-            mainAxisSpacing: 13.h,
-            gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-            ),
-            itemBuilder: (BuildContext context, int i) {
-              return LiveRoomCard(
-                liveRoom: _.liveRoomList[i],
-                height: i.isEven ? 153.h : 186.h,
-              );
+          body: RefreshIndicator(
+            onRefresh: () {
+              return _.loadData();
             },
-            itemCount: _.liveRoomList.length,
+            child: MasonryGridView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              crossAxisSpacing: 11.w,
+              mainAxisSpacing: 13.h,
+              gridDelegate:
+                  const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (BuildContext context, int i) {
+                return LiveRoomCard(
+                  liveRoom: _.liveRoomList[i],
+                  height: i.isEven ? 153.h : 186.h,
+                );
+              },
+              itemCount: _.liveRoomList.length,
+            ),
           ),
         ),
       );

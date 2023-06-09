@@ -25,20 +25,25 @@ class HotLivePage extends StatelessWidget {
             ),
           ),
         ),
-        body: MasonryGridView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          crossAxisSpacing: 11.w,
-          mainAxisSpacing: 13.h,
-          gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          itemBuilder: (BuildContext context, int i) {
-            return LiveRoomCard(
-              liveRoom: _.liveRoomList[i],
-              height: i.isEven ? 153.h : 186.h,
-            );
+        body: RefreshIndicator(
+          onRefresh: () {
+            return _.loadData();
           },
-          itemCount: _.liveRoomList.length,
+          child: MasonryGridView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            crossAxisSpacing: 11.w,
+            mainAxisSpacing: 13.h,
+            gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+            ),
+            itemBuilder: (BuildContext context, int i) {
+              return LiveRoomCard(
+                liveRoom: _.liveRoomList[i],
+                height: i.isEven ? 153.h : 186.h,
+              );
+            },
+            itemCount: _.liveRoomList.length,
+          ),
         ),
       );
     });

@@ -53,6 +53,7 @@ class AppChatRoomActionBar<T extends AppChatRoomController>
               onTap: () {
                 Get.bottomSheet(LiveGiftSheet(
                   liveRoom: _.liveRoom,
+                  onSubmitted: _.sendMessage,
                 ));
               },
               child: Image.asset(

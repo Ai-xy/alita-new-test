@@ -3,6 +3,7 @@
 import 'package:alita/api/login_api.dart';
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/kit/app_validate_kit.dart';
+import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
@@ -35,6 +36,8 @@ class LoginController extends BaseAppController {
     }
 
     return LoginApi.login(email: email, password: password).then((user) {
+      print('登录返回用户信息');
+      print(user.toJson().toString());
       return _afterLogin(user: user);
     });
   }
@@ -45,9 +48,9 @@ class LoginController extends BaseAppController {
 
   Future _afterLogin({required UserProfileModel user}) {
     return saveUserInfo(user).then((value) {
-      return user.valid == 1 ? loginYX() : Get.offAllNamed(AppPath.setProfile);
+      print('_afterLogin${value},${user.toJson()}');
+      return user.valid == 1 ? null : Get.offAllNamed(AppPath.setProfile);
     }).then((value) async {
-      await loginYX();
       return Get.offAllNamed(AppPath.home);
     });
   }

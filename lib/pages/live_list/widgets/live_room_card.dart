@@ -3,6 +3,8 @@ import 'package:alita/R/app_icon.dart';
 import 'package:alita/api/live_api.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/ui/app_live_room_model.dart';
+import 'package:alita/pages/about_us/dialog/app_logout_dialog.dart';
+import 'package:alita/pages/edit_profile/dialog/app_rename_dialog.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/toast.dart';
@@ -16,6 +18,8 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
+String? password = '';
+LiveRoomModel? mLiveRoom;
 CancelFunc showLiveRoomPinputDialog() {
   return BotToast.showAnimationWidget(
       backgroundColor: AppColor.barrierBackgroundColor,
@@ -82,8 +86,10 @@ CancelFunc showLiveRoomPinputDialog() {
 class LiveRoomCard extends StatelessWidget {
   final LiveRoomModel liveRoom;
   final double? height;
-  const LiveRoomCard({Key? key, required this.liveRoom, this.height})
+  LiveRoomCard({Key? key, required this.liveRoom, this.height})
       : super(key: key);
+
+  int thr = 10000;
 
   void joinLiveRoom() {
     // if(liveRoom.liveState==2){
@@ -111,6 +117,7 @@ class LiveRoomCard extends StatelessWidget {
     //       arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
     //       preventDuplicates: false);
     // }).whenComplete(cancelFunc);
+
     if (PictureInPicture.isActive) {
       PictureInPicture.stopPiP();
     }
@@ -120,16 +127,21 @@ class LiveRoomCard extends StatelessWidget {
         .then((value) {
       print('value值');
       print(value);
-      if (liveRoom.liveState == 2) {
-        Get.toNamed(AppPath.liveRoom,
-            arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
-            preventDuplicates: false);
+      mLiveRoom = liveRoom;
+      if (liveRoom.lockFlag == "1") {
+        password = liveRoom.password;
+        Get.dialog(passWordDialog());
       } else {
-        Get.toNamed(AppPath.anchorLiveEnd,
-            preventDuplicates: false, arguments: liveRoom);
+        if (liveRoom.liveState == 2) {
+          Get.toNamed(AppPath.liveRoom,
+              arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
+              preventDuplicates: false);
+        } else {
+          Get.toNamed(AppPath.anchorLiveEnd,
+              preventDuplicates: false, arguments: liveRoom);
+        }
       }
     }).whenComplete(cancelFunc);
-
 
     return;
   }
@@ -173,7 +185,9 @@ class LiveRoomCard extends StatelessWidget {
                             ),
                             Gap(4.w),
                             Text(
-                              '142.7K',
+                              liveRoom.sentiment! >= thr
+                                  ? '${(liveRoom.sentiment! / 1000).toStringAsFixed(1).replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "")}k'
+                                  : liveRoom.sentiment!.toString(),
                               style: TextStyle(
                                 fontSize: 10.sp,
                                 color: AppColor.white,
@@ -212,5 +226,172 @@ class LiveRoomCard extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Widget passWordDialog() {
+    return const CustomDialog();
+  }
+}
+
+class CustomDialog extends StatelessWidget {
+  const CustomDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Center(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: Colors.white),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 16.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(),
+                          GestureDetector(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: Image.asset(
+                              'assets/images/close.png',
+                              color: const Color.fromRGBO(32, 32, 32, .3),
+                              height: 24.w,
+                              width: 24.w,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30.w, 0, 30.w, 22.w),
+                      child: Text(
+                        'The room has a password set, please enter the password',
+                        style: TextStyle(
+                            color: const Color.fromRGBO(51, 51, 51, 1),
+                            fontSize: 16.sp),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const PasswordInput(),
+                    Gap(37.w)
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PasswordInput extends StatefulWidget {
+  const PasswordInput({super.key});
+
+  @override
+  _PasswordInputState createState() => _PasswordInputState();
+}
+
+class _PasswordInputState extends State<PasswordInput> {
+  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<TextEditingController> _controllers =
+      List.generate(4, (_) => TextEditingController());
+
+  @override
+  void dispose() {
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(
+        4,
+        (index) => Container(
+          width: 54.w,
+          height: 54.w,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: TextField(
+            controller: _controllers[index],
+            focusNode: _focusNodes[index],
+            textAlign: TextAlign.center,
+            obscureText: true,
+            obscuringCharacter: '\u{25CF}',
+            maxLength: 1,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color.fromRGBO(255, 229, 190, 1),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.r),
+                borderSide: const BorderSide(
+                  color: Colors.orange,
+                  width: 2,
+                ),
+              ),
+              counterText: '',
+            ),
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                if (_controllers[0].text.isNotEmpty &&
+                    _controllers[1].text.isNotEmpty &&
+                    _controllers[2].text.isNotEmpty &&
+                    _controllers[3].text.isNotEmpty) {
+                  for (var node in _focusNodes) {
+                    node.unfocus();
+                  }
+                  if (password ==
+                      '${_controllers[0].text}${_controllers[1].text}${_controllers[2].text}${_controllers[3].text}') {
+                    // 进入密码房间
+                    Get.back();
+                    if (mLiveRoom?.liveState == 2) {
+                      Get.toNamed(AppPath.liveRoom,
+                          arguments: AppLiveRoomModel(
+                              liveRoom: mLiveRoom!, streamUrl: value),
+                          preventDuplicates: false);
+                    } else {
+                      Get.toNamed(AppPath.anchorLiveEnd,
+                          preventDuplicates: false, arguments: mLiveRoom);
+                    }
+                  } else {
+                    AppToast.alert(message: 'The password is incorrect');
+                  }
+                } else {
+                  _focusNodes[(index + 1) % 4].requestFocus();
+                }
+              } else {
+                _focusNodes[(index + 3) % 4].requestFocus();
+              }
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

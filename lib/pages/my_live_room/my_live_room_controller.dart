@@ -28,6 +28,7 @@ class MyLiveRoomController extends AppChatRoomController
   // 截下的图
   Uint8List? screenShotImage;
 
+  // 反转摄像头
   Future flipCamera() {
     if (cameraController == null) {
       return Future.error('cameraController is null');
@@ -112,6 +113,7 @@ class MyLiveRoomController extends AppChatRoomController
     WidgetsBinding.instance.removeObserver(this);
     Wakelock.disable();
     cameraController?.stopVideoStreaming();
+    cameraController?.dispose();
     super.onClose();
   }
 

@@ -16,7 +16,6 @@ import 'package:nim_core/nim_core.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 
-
 class ChatController extends BaseAppFutureLoadStateController {
   final AppUserConversationModel conversation;
 
@@ -44,6 +43,7 @@ class ChatController extends BaseAppFutureLoadStateController {
   StreamSubscription? _voiceStreamSubscription;
   FlutterSoundPlayer player = FlutterSoundPlayer();
   bool isPlaying = false;
+  bool isSendMsg = false;
 
   @override
   void onInit() {
@@ -51,10 +51,13 @@ class ChatController extends BaseAppFutureLoadStateController {
     Log.d('mSessionId:${mSessionId}');
 
     yxSessionId = sessionId == 'null' ? mSessionId : sessionId;
-    NimCore.instance.messageService.createSession(
-        sessionId: yxSessionId!,
-        sessionType: NIMSessionType.p2p,
-        time: DateTime.now().millisecond);
+
+
+    // NimCore.instance.messageService.createSession(
+    //     sessionId: yxSessionId!,
+    //     sessionType: NIMSessionType.p2p,
+    //     time: DateTime.now().millisecond);
+
     _subscription = NimCore.instance.messageService.onMessage.listen((event) {
       _addMessageList(event);
     });
@@ -290,4 +293,17 @@ class ChatController extends BaseAppFutureLoadStateController {
       return DateFormat('HH : mm').format(messageTime);
     }
   }
+
+  Future query(String yxId) async {
+    isSendMsg = false;
+    await AppNimKit.instance.queryIsSendMsg(yxId).then((value) {
+      if (value) {
+        isSendMsg = true;
+      }
+      update();
+    });
+    update();
+  }
+
+
 }

@@ -15,6 +15,7 @@ class HomeBinding extends Bindings {
     Get.lazyPut(() => HotLiveController());
     Get.lazyPut(() => FollowController());
     Get.lazyPut(() => UserProfileController());
+
     Get.put(CountryService());
   }
 }

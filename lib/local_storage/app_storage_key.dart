@@ -6,4 +6,6 @@ enum AppStorageKey {
   user,
   userId,
   yxAccid,
+  pip,
+  roomId
 }

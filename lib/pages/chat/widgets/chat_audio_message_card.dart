@@ -84,7 +84,9 @@ class _ChatAudioMessageCardState extends State<ChatAudioMessageCard> {
                   padding: const EdgeInsets.only(right: 15),
                   child: SizedBox(
                       width: 14,
-                      child: Image.asset('assets/images/icon_voice.png')),
+                      child: Image.asset(!isPlaying
+                          ? 'assets/images/icon_voice.png'
+                          : 'assets/images/icon_voice_play.png')),
                 ),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(

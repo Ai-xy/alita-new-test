@@ -11,6 +11,9 @@ abstract class BaseAppController extends GetxController {
   /// 订阅自销毁池
   final Queue<StreamSubscription> _subscriptions = Queue();
 
+  /// 判断是否登录云信
+  var isLoggedYxIn = false.obs;
+
   UserProfileModel? get user => UserProfileModel.fromJson(
       AppLocalStorage.getJson(AppStorageKey.user) ?? {});
 
@@ -38,6 +41,8 @@ abstract class BaseAppController extends GetxController {
       AppLocalStorage.setJson(AppStorageKey.user, user.toJson()),
       AppLocalStorage.setInt(AppStorageKey.userId, user.userId ?? 0),
       AppLocalStorage.setString(AppStorageKey.yxAccid, '${user.yxAccid}'),
+      AppLocalStorage.setBool(AppStorageKey.pip, false),
+      AppLocalStorage.setInt(AppStorageKey.roomId, -1)
     ]);
   }
 

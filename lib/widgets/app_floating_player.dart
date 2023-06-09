@@ -1,4 +1,5 @@
 import 'package:alita/R/app_icon.dart';
+import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/ui/app_live_room_model.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:fijkplayer/fijkplayer.dart';
@@ -51,6 +52,8 @@ class AppFloatingPlayer extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
                   PictureInPicture.stopPiP();
+                  AppLocalStorage.setBool(AppStorageKey.pip, false);
+                  fijkPlayer.pause();
                   fijkPlayer.release();
                 },
                 child: Image.asset(

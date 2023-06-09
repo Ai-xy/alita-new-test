@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'package:alita/config/app_config.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
+import 'package:alita/manager/auth_manager.dart';
 import 'package:alita/model/api/user_profile_model.dart';
+import 'package:alita/pages/session_list/session_list_controller.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
 import 'package:video_player/video_player.dart';
 
@@ -30,8 +33,6 @@ class AppNimKit {
     _messages.add(data);
   }
 
-  final UserProfileModel user = UserProfileModel.fromJson(
-      AppLocalStorage.getJson(AppStorageKey.user) ?? {});
   AppNimKit._();
 
   Future _ensureSdkIsInitialized() {
@@ -61,15 +62,26 @@ class AppNimKit {
     });
   }
 
+  //final SessionListController logic = Get.put(SessionListController());
   Future<bool> login() {
     return _ensureSdkIsInitialized().then((value) {
+      final UserProfileModel user = UserProfileModel.fromJson(
+          AppLocalStorage.getJson(AppStorageKey.user) ?? {});
+      print('云信IM登录前：account: ${user.yxAccid}, token: ${user.imToken}');
       return NimCore.instance.authService
           .login(NIMLoginInfo(
               account: '${user.yxAccid}', token: '${user.imToken}'))
           .then((value) {
         Log.i('IM登录结果$value', tag: tag);
-        AppToast.alert(message: 'login success');
-        return true;
+        if (value.isSuccess) {
+          AppToast.alert(message: 'login success');
+          //logic.loadData();
+          AuthManager().login();
+          return true;
+        } else {
+          AppToast.alert(message: '${value.errorDetails}');
+          return false;
+        }
       }).catchError((err, s) {
         Log.e('IM登录出错', tag: tag, error: err, stackTrace: s);
         AppToast.alert(message: 'login fail');
@@ -224,5 +236,19 @@ class AppNimKit {
           ? sendMessage(message: value.data!, resend: false)
           : Future.value(value.data);
     });
+  }
+
+  // 查询是否有过对话
+  Future<bool> queryIsSendMsg(String id) async {
+    NIMResult<List<NIMMessage>> messageList = await NimCore
+        .instance.messageService
+        .queryMessageList(id, NIMSessionType.p2p, 200);
+
+    Log.d('${messageList.data?.length}', tag: 'messageList');
+    if (messageList.data?.length == 0 || messageList.data == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

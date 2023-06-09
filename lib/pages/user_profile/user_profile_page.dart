@@ -3,10 +3,12 @@ import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/R/app_text_style.dart';
 import 'package:alita/model/ui/profile_tile_model.dart';
+import 'package:alita/pages/session_list/session_list_controller.dart';
 import 'package:alita/pages/user_profile/user_profile_controller.dart';
 import 'package:alita/pages/user_profile/widgets/user_profile_card.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,7 +16,9 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
 class UserProfilePage extends StatelessWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  UserProfilePage({Key? key}) : super(key: key);
+
+  final SessionListController logic = Get.put(SessionListController());
 
   @override
   Widget build(BuildContext context) {
@@ -242,13 +246,21 @@ class UserProfilePage extends StatelessWidget {
                                 Get.toNamed(AppPath.sessionList);
                               }),
                           ProfileTileModel(
-                            label: AppMessage.knapsack.tr,
-                            icon: AppIcon.myKnapsack.uri,
-                          ),
+                              label: AppMessage.knapsack.tr,
+                              icon: AppIcon.myKnapsack.uri,
+                              onTap: () {
+                                AppToast.alert(
+                                    message:
+                                        'The next version will be available soon');
+                              }),
                           ProfileTileModel(
-                            label: AppMessage.signIn.tr,
-                            icon: AppIcon.signIn.uri,
-                          ),
+                              label: AppMessage.signIn.tr,
+                              icon: AppIcon.signIn.uri,
+                              onTap: () {
+                                AppToast.alert(
+                                    message:
+                                        'The next version will be available soon');
+                              }),
                         ];
                         return Row(
                           children: [
@@ -286,10 +298,17 @@ class UserProfilePage extends StatelessWidget {
                     ProfileTileModel(
                         label: AppMessage.anchorCenter.tr,
                         onTap: () {
-                          Get.toNamed(AppPath.anchorProfile, arguments: _.user);
+                          Get.toNamed(AppPath.anchorCenter, arguments: _.user);
                         }),
                     ProfileTileModel(
-                        label: AppMessage.officialCustomerService.tr),
+                        label: AppMessage.officialNotification.tr,
+                        onTap: () {
+                          logic.loadData().whenComplete(() {
+                            Get.toNamed(AppPath.chat,
+                                arguments: logic.conversationTipList[0]);
+                          });
+
+                        }),
                     ProfileTileModel(
                         label: AppMessage.problemFeedback.tr,
                         onTap: () {

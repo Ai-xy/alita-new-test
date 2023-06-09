@@ -21,9 +21,11 @@ class ChatPage extends StatelessWidget {
           backgroundColor: AppColor.white,
           appBar: AppBar(
             centerTitle: false,
-            title: Text(_.conversation.session.senderNickname == ''
+            title: Text(_.conversation.nimUser?.nick == ''
                 ? AppMessage.officalNotice.tr
-                : '${_.conversation.session.senderNickname}'),
+                : '${_.conversation.nimUser?.nick}' == 'null'
+                    ? 'Official Notice'
+                    : '${_.conversation.nimUser?.nick}'),
             actions:
                 _.conversation.session.lastMessageType != NIMMessageType.tip
                     ? [

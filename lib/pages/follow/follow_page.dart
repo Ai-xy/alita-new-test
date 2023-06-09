@@ -58,19 +58,20 @@ class FollowPage extends StatelessWidget {
                     ),
                     indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Get.toNamed(AppPath.addMoments)?.then((value) {
-                        if(value){
-                          _.loadData();
-                        }
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 16.w),
-                      child: const Icon(Icons.add),
-                    ),
-                  )
+                  // 发布朋友圈按钮
+                  // InkWell(
+                  //   onTap: () {
+                  //     Get.toNamed(AppPath.addMoments)?.then((value) {
+                  //       if(value){
+                  //         _.loadData();
+                  //       }
+                  //     });
+                  //   },
+                  //   child: Padding(
+                  //     padding: EdgeInsets.only(right: 16.w),
+                  //     child: const Icon(Icons.add),
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -78,19 +79,24 @@ class FollowPage extends StatelessWidget {
           body: TabBarView(
               children: List.generate(
                   2,
-                  (index) => ListView.separated(
-                        padding: EdgeInsets.only(bottom: 10.h),
-                        separatorBuilder: (BuildContext context, int i) {
-                          return Gap(10.h);
+                  (index) => RefreshIndicator(
+                        onRefresh: () {
+                          return _.loadData();
                         },
-                        itemBuilder: (BuildContext context, int i) {
-                          return MomentCard(
-                            moment: _.momentList[i],
-                            isMe: false,
-                            followController: _,
-                          );
-                        },
-                        itemCount: _.momentList.length,
+                        child: ListView.separated(
+                          padding: EdgeInsets.only(bottom: 10.h),
+                          separatorBuilder: (BuildContext context, int i) {
+                            return Gap(10.h);
+                          },
+                          itemBuilder: (BuildContext context, int i) {
+                            return MomentCard(
+                              moment: _.momentList[i],
+                              isMe: false,
+                              followController: _,
+                            );
+                          },
+                          itemCount: _.momentList.length,
+                        ),
                       ))),
         ),
       );

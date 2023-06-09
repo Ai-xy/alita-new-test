@@ -6,6 +6,7 @@ import 'package:alita/model/ui/app_conversation_model.dart';
 import 'package:alita/pages/session_list/session_list_controller.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
+import 'package:alita/util/log.dart';
 import 'package:alita/widgets/app_image.dart';
 import 'package:alita/widgets/app_slide_action.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +19,17 @@ import 'package:nim_core/nim_core.dart';
 
 class SessionCard extends GetView<SessionListController> {
   final AppUserConversationModel conversation;
-  const SessionCard({Key? key, required this.conversation}) : super(key: key);
+  final NIMUser nimUser;
+  const SessionCard(
+      {Key? key, required this.conversation, required this.nimUser})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final NIMSession session = conversation.session;
-    final NIMUser? nimUser = conversation.nimUser;
+    NIMSession session = conversation.session;
+    NIMUser nimUser = this.nimUser;
+    conversation.nimUser = this.nimUser;
+
     return GestureDetector(
       onTap: () {
         Get.toNamed(AppPath.chat, arguments: conversation)?.then((value) {
@@ -72,7 +78,7 @@ class SessionCard extends GetView<SessionListController> {
                   Stack(
                     children: [
                       AppImage(
-                        '${conversation.nimUser?.avatar}',
+                        '${nimUser.avatar ?? conversation.nimUser?.avatar}',
                         width: 48.r,
                         height: 48.r,
                         borderRadius: BorderRadius.circular(24.r),
@@ -116,7 +122,7 @@ class SessionCard extends GetView<SessionListController> {
                               child: Text(
                                 session.lastMessageType == NIMMessageType.tip
                                     ? AppMessage.officalNotice.tr
-                                    : '${nimUser?.nick}',
+                                    : '${nimUser.nick}',
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: AppFontWeight.bold,

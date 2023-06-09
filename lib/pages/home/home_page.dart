@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
       return Scaffold(
         body: IndexedStack(
           index: _.currentTab.index,
-          children: const [
+          children: [
             LiveListPage(),
             HotLivePage(),
             FollowPage(),

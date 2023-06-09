@@ -40,7 +40,7 @@ class _MomentController extends BaseAppFutureLoadStateController {
 
   Future comment() {
     return Get.bottomSheet(AppBottomInputField(
-      onSubmitted: (String s) {
+      onSubmitted: (String s,{String? giftUrl,String? giftNum}) {
         return MomentApi.comment(content: s, momentId: '${moment.id}')
             .then((value) {
           moment.commentNum = (moment.commentNum ?? 0) + 1;

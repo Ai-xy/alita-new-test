@@ -54,7 +54,7 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
       return Future.error(AppMessage.uploadCoverTip.tr);
     }
     if (liveRoomType == AppLiveRoomType.passwordRoom &&
-        RegExp(r'\d{4}').hasMatch(password)) {
+        !(RegExp(r'^\d{4}$').stringMatch(password) == password)) {
       AppToast.alert(message: AppMessage.enterLiveRoomPassword.tr);
       return Future.error(AppMessage.enterLiveRoomPassword.tr);
     }

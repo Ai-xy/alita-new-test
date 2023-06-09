@@ -64,6 +64,7 @@ enum AppIcon {
   followerLive('assets/images/follower_live.png'),
   followingLive('assets/images/following_live.png'),
   anchorLike('assets/images/anchor_like.png'),
+  anchorUnLike('assets/images/anchor_unlike.png'),
   addFriend('assets/images/add_friend.png'),
   chatEmoji('assets/images/chat_emoji.png'),
   chatGift('assets/images/chat_gift.png'),

@@ -49,7 +49,6 @@ class LiveAnchorSheetController extends BaseAppController {
   //获取用户信息
   getUserInfo(int? value, LiveRoomModel? liveRoom) {
     this.liveRoom = liveRoom;
-    AppToast.alert(message: '$value');
     usId = value;
     getMyUserInfo();
   }

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:alita/base/base_app_future_controller.dart';
 import 'package:alita/model/ui/app_conversation_model.dart';
 import 'package:alita/util/log.dart';
@@ -10,12 +9,32 @@ import 'package:nim_core/nim_core.dart';
 class SessionListController extends BaseAppFutureLoadStateController {
   RxList<AppUserConversationModel> conversationList =
       <AppUserConversationModel>[].obs;
+  RxList<AppUserConversationModel> conversationTipList =
+      <AppUserConversationModel>[].obs;
+
+  List<AppUserConversationModel> get getConversationTipList =>
+      conversationTipList;
+  StreamSubscription? streamSubscription;
+  var userSessionList = List.empty(growable: true);
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
+    streamSubscription =
+        NimCore.instance.messageService.onMessage.listen((event) {
+      loadData();
+      update();
+    });
     loadData();
+  }
+
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    conversationList.clear();
+    conversationTipList.clear();
+    streamSubscription?.cancel();
+    super.onClose();
   }
 
   @override
@@ -27,17 +46,20 @@ class SessionListController extends BaseAppFutureLoadStateController {
   }
 
   @override
-  Future loadData({Map? params}) {
-    Log.d('加载信息');
-    NimCore.instance.messageService.querySessionList(100).then((value) {
-      Log.d('哈哈哈${value.toMap()}');
+  Future loadData({Map? params}) async {
+    await NimCore.instance.messageService.querySessionList(100).then((value) {
+      Log.d('querySessionList: ${value.toMap()}');
       if (value.data is List<NIMSession>) {
         conversationList.value = (value.data as List<NIMSession>)
             .where((e) => e.sessionId != null.toString())
-            .map((e) => AppUserConversationModel(session: e))
-            .toList();
+            .map((e) {
+          if (e.lastMessageType == NIMMessageType.tip) {
+            conversationTipList.add(AppUserConversationModel(session: e));
+          }
+          return AppUserConversationModel(session: e);
+        }).toList();
         return Future.forEach<AppUserConversationModel>(conversationList, (e) {
-          print('就哦哦');
+          print('conversationList内容是');
           print(e.session.toMap());
           return NimCore.instance.userService
               .getUserInfo(e.session.sessionId)
@@ -49,6 +71,8 @@ class SessionListController extends BaseAppFutureLoadStateController {
           });
         });
       }
+    }).then((value) {
+      getMsgList();
     });
     update();
     return Future.value();
@@ -71,5 +95,21 @@ class SessionListController extends BaseAppFutureLoadStateController {
         AppToast.alert(message: 'delete fail');
       }
     });
+  }
+
+  // 查询云信用户信息
+  Future<void> getMsgList() async {
+    if (conversationList.length > 0) {
+      List<String> ids = [];
+      conversationList.forEach((element) {
+        ids.add(element.session.sessionId);
+      });
+
+      NIMResult<List<NIMUser>> userList =
+          await NimCore.instance.userService.fetchUserInfoList(ids);
+      Log.d('ListUser > ${userList.toMap()}', tag: '云信用户信息');
+      userSessionList.addAll(userList.data!);
+      update();
+    }
   }
 }

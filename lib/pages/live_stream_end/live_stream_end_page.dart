@@ -14,132 +14,140 @@ class LiveStreamEndPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Container(
-        width: Get.width,
-        height: Get.height,
-        color: const Color(0xFFF6F1E5),
-        child: Column(
-          children: [
-            Gap(kToolbarHeight + 10.h),
-            Container(
-              margin: EdgeInsets.only(right: 30.w),
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  Get.back();
-                },
-                child: Image.asset(
-                  AppIcon.exit.uri,
-                  width: 18.r,
-                  height: 18.r,
-                  color: const Color(0xFF646363),
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Material(
+        child: Container(
+          width: Get.width,
+          height: Get.height,
+          color: const Color(0xFFF6F1E5),
+          child: Column(
+            children: [
+              Gap(kToolbarHeight + 10.h),
+              Container(
+                margin: EdgeInsets.only(right: 30.w),
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    // Get.back();
+                    // Get.back();
+                    // Get.back();
+                    Get.offAllNamed(AppPath.home);
+                  },
+                  child: Image.asset(
+                    AppIcon.exit.uri,
+                    width: 18.r,
+                    height: 18.r,
+                    color: const Color(0xFF646363),
+                  ),
                 ),
               ),
-            ),
-            Gap(42.h),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  AppIcon.liveStreamEnd.uri,
-                  width: 116.r,
-                  height: 116.r,
-                ),
-                Text(
-                  AppMessage.liveStreamHasEnded.tr,
-                  style: TextStyle(fontSize: 16.sp),
-                ),
-                Gap(35.h),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.w),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 30.h, horizontal: 40.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.r),
+              Gap(42.h),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    AppIcon.liveStreamEnd.uri,
+                    width: 116.r,
+                    height: 116.r,
                   ),
-                  child: GetBuilder<LiveStreamEndController>(builder: (_) {
-                    final TextStyle valueStyle = TextStyle(
-                      fontSize: 18.sp,
-                      color: AppColor.bodyText2Color,
-                      fontWeight: AppFontWeight.bold,
-                    );
-                    final TextStyle keyStyle = TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColor.bodyText2Color.withOpacity(.5),
-                    );
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            child: Column(
-                          children: [
-                            Text(
-                              '421',
-                              style: valueStyle,
-                            ),
-                            Gap(2.h),
-                            Text(
-                              AppMessage.watchNumber.tr,
-                              style: keyStyle,
-                            ),
-                            Gap(30.h),
-                            Text(
-                              '1000',
-                              style: valueStyle,
-                            ),
-                            Gap(2.h),
-                            Text(
-                              AppMessage.getDiamonds.tr,
-                              style: keyStyle,
-                            ),
-                            Gap(30.h),
-                            Text(
-                              '90',
-                              style: valueStyle,
-                            ),
-                            Gap(2.h),
-                            Text(
-                              AppMessage.newFollowers.tr,
-                              style: keyStyle,
-                            ),
-                          ],
-                        )),
-                        Expanded(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              '12: 01: 23',
-                              style: valueStyle,
-                            ),
-                            Gap(2.h),
-                            Text(
-                              AppMessage.liveDuration.tr,
-                              style: keyStyle,
-                            ),
-                            Gap(30.h),
-                            Text(
-                              '10',
-                              style: valueStyle,
-                            ),
-                            Gap(2.h),
-                            Text(
-                              AppMessage.gifitingUsers.tr,
-                              style: keyStyle,
-                            ),
-                          ],
-                        )),
-                      ],
-                    );
-                  }),
-                ),
-              ],
-            ),
-          ],
+                  Text(
+                    AppMessage.liveStreamHasEnded.tr,
+                    style: TextStyle(fontSize: 16.sp),
+                  ),
+                  Gap(35.h),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 30.h, horizontal: 40.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: GetBuilder<LiveStreamEndController>(builder: (_) {
+                      final TextStyle valueStyle = TextStyle(
+                        fontSize: 18.sp,
+                        color: AppColor.bodyText2Color,
+                        fontWeight: AppFontWeight.bold,
+                      );
+                      final TextStyle keyStyle = TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColor.bodyText2Color.withOpacity(.5),
+                      );
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              child: Column(
+                            children: [
+                              Text(
+                                '421',
+                                style: valueStyle,
+                              ),
+                              Gap(2.h),
+                              Text(
+                                AppMessage.watchNumber.tr,
+                                style: keyStyle,
+                              ),
+                              Gap(30.h),
+                              Text(
+                                '1000',
+                                style: valueStyle,
+                              ),
+                              Gap(2.h),
+                              Text(
+                                AppMessage.getDiamonds.tr,
+                                style: keyStyle,
+                              ),
+                              Gap(30.h),
+                              Text(
+                                '90',
+                                style: valueStyle,
+                              ),
+                              Gap(2.h),
+                              Text(
+                                AppMessage.newFollowers.tr,
+                                style: keyStyle,
+                              ),
+                            ],
+                          )),
+                          Expanded(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                '12: 01: 23',
+                                style: valueStyle,
+                              ),
+                              Gap(2.h),
+                              Text(
+                                AppMessage.liveDuration.tr,
+                                style: keyStyle,
+                              ),
+                              Gap(30.h),
+                              Text(
+                                '10',
+                                style: valueStyle,
+                              ),
+                              Gap(2.h),
+                              Text(
+                                AppMessage.gifitingUsers.tr,
+                                style: keyStyle,
+                              ),
+                            ],
+                          )),
+                        ],
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
