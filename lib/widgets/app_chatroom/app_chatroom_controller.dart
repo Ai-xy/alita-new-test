@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/kit/app_nim_kit.dart';
+import 'package:alita/manager/auth_manager.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
@@ -192,6 +193,8 @@ abstract class AppChatRoomController extends BaseAppController {
   }
 
   Future onEnterRoom() {
+    // 保存im 房间id，关闭最小化窗口时使用。
+    AuthManager().setRoomId(yxRoomId);
     _listenLiveRoomState();
     return AppNimKit.instance
         .enterChatRoom(

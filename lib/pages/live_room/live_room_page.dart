@@ -1,5 +1,6 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
+import 'package:alita/kit/app_fijk_player_kit.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/ui/app_live_action_model.dart';
 import 'package:alita/pages/live_room/live_room_controller.dart';
@@ -36,7 +37,7 @@ class LiveRoomPage extends GetView<LiveRoomController> {
         AppLocalStorage.setBool(AppStorageKey.pip, true);
         PictureInPicture.startPiP(
             pipWidget: AppFloatingPlayer(
-          fijkPlayer: controller.fijkPlayer,
+          fijkPlayer: FijkPlayerManager().fijkPlayer,
           live: controller.live,
         ));
         return Future.value(true);
@@ -60,7 +61,7 @@ class LiveRoomPage extends GetView<LiveRoomController> {
                       fit: FijkFit.cover,
                       width: double.maxFinite,
                       height: Get.mediaQuery.size.height,
-                      player: _.fijkPlayer,
+                      player: FijkPlayerManager().fijkPlayer,
                       color: Colors.transparent,
                       cover: AppNetworkImage('${_.live.liveRoom.coverImg}'),
                       panelBuilder: (FijkPlayer player,

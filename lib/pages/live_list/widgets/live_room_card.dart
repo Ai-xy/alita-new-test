@@ -1,6 +1,7 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/api/live_api.dart';
+import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/ui/app_live_room_model.dart';
 import 'package:alita/pages/about_us/dialog/app_logout_dialog.dart';
@@ -91,59 +92,47 @@ class LiveRoomCard extends StatelessWidget {
 
   int thr = 10000;
 
-  void joinLiveRoom() {
-    // if(liveRoom.liveState==2){
-    //   Get.toNamed(AppPath.liveRoom,
-    //       preventDuplicates: false, arguments: liveRoom);
-    // }else{
-    //   Get.toNamed(AppPath.anchorLiveEnd,
-    //       preventDuplicates: false, arguments: liveRoom);
-    // }
-
-    // Get.toNamed(AppPath.anchorLiveEnd,
-    //     preventDuplicates: false, arguments: liveRoom);
-
-    ///
-    // if (PictureInPicture.isActive) {
-    //   PictureInPicture.stopPiP();
-    // }
-    // CancelFunc cancelFunc = AppToast.loading();
-    // LiveApi.getLiveStream(
-    //         id: liveRoom.id ?? 0, password: '${liveRoom.password}')
-    //     .then((value) {
-    //   print('value值');
-    //   print(value);
-    //   Get.toNamed(AppPath.liveRoom,
-    //       arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
-    //       preventDuplicates: false);
-    // }).whenComplete(cancelFunc);
-
-    if (PictureInPicture.isActive) {
-      PictureInPicture.stopPiP();
-    }
-    CancelFunc cancelFunc = AppToast.loading();
-    LiveApi.getLiveStream(
-            id: liveRoom.id ?? 0, password: '${liveRoom.password}')
-        .then((value) {
-      print('value值');
-      print(value);
-      mLiveRoom = liveRoom;
-      if (liveRoom.lockFlag == "1") {
-        password = liveRoom.password;
-        Get.dialog(passWordDialog());
-      } else {
-        if (liveRoom.liveState == 2) {
-          Get.toNamed(AppPath.liveRoom,
-              arguments: AppLiveRoomModel(liveRoom: liveRoom, streamUrl: value),
-              preventDuplicates: false);
-        } else {
-          Get.toNamed(AppPath.anchorLiveEnd,
-              preventDuplicates: false, arguments: liveRoom);
-        }
+  void joinLiveRoom() async {
+    bool isPip;
+    isPip = AppLocalStorage.getBool(AppStorageKey.pip);
+    if (isPip == true) {
+      AppToast.alert(message: 'Please close the small window first');
+    } else {
+      if (PictureInPicture.isActive) {
+        PictureInPicture.stopPiP();
       }
-    }).whenComplete(cancelFunc);
+      await queryAuthorLiveRoomInfo(liveRoom.homeownerId!);
+    }
 
     return;
+  }
+
+  // 进入关注的人的直播间
+  Future queryAuthorLiveRoomInfo(int userId) {
+    return LiveApi.queryAuthorLiveRoomInfo(userId).then((value) {
+      LiveRoomModel model = value;
+      CancelFunc cancelFunc = AppToast.loading();
+
+      LiveApi.getLiveStream(id: model.id ?? 0, password: '${model.password}')
+          .then((value) {
+        mLiveRoom = model;
+        mLiveRoom?.streamUrl = value;
+        if (model.lockFlag == "1") {
+          password = model.password;
+          Get.dialog(passWordDialog());
+        } else {
+          if (model.liveState == 2) {
+            Get.toNamed(AppPath.liveRoom,
+                arguments: AppLiveRoomModel(liveRoom: model, streamUrl: value),
+                preventDuplicates: false);
+          } else {
+            Get.toNamed(AppPath.anchorLiveEnd,
+                preventDuplicates: false, arguments: model);
+          }
+        }
+      }).whenComplete(cancelFunc);
+      return model;
+    });
   }
 
   @override

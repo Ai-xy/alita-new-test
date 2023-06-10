@@ -66,12 +66,20 @@ class AboutUsPage extends StatelessWidget {
                               fontWeight: AppFontWeight.bold,
                             ),
                           ),
-                          Image.asset(
-                            AppIcon.tileNext.uri,
-                            width: 20.r,
-                            height: 20.r,
-                            color: AppColor.black,
-                          ),
+                          tile.label != AppMessage.appVersion.tr
+                              ? Image.asset(
+                                  AppIcon.tileNext.uri,
+                                  width: 20.r,
+                                  height: 20.r,
+                                  color: AppColor.black,
+                                )
+                              : Text(
+                                  'V1.0.0',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: AppFontWeight.bold,
+                                  ),
+                                ),
                         ],
                       ),
                     ),

@@ -81,6 +81,7 @@ class AppNimKit {
           AppToast.alert(message: 'login success');
           //logic.loadData();
           AuthManager().login();
+          AppLocalStorage.setBool(AppStorageKey.pip, false);
           return true;
         } else {
           AppToast.alert(message: '${value.errorDetails}');
@@ -255,6 +256,4 @@ class AppNimKit {
       return true;
     }
   }
-
-
 }

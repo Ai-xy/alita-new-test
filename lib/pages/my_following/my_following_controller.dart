@@ -7,6 +7,8 @@ import 'package:alita/model/ui/app_live_room_model.dart';
 import 'package:alita/pages/live_list/widgets/live_room_card.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:get/get.dart';
 
 class MyFollowingController extends BaseAppFutureLoadStateController {
@@ -47,23 +49,50 @@ class MyFollowingController extends BaseAppFutureLoadStateController {
     });
   }
 
-  // 进入关注的人的直播间
+  // // 进入关注的人的直播间
+  // Future queryAuthorLiveRoomInfo(int userId) {
+  //   return LiveApi.queryAuthorLiveRoomInfo(userId).then((value) {
+  //     LiveRoomModel model = value;
+  //     if (model.lockFlag == "1") {
+  //       password = model.password;
+  //       Get.dialog(const CustomDialog());
+  //     } else {
+  //       if (model.liveState == 2) {
+  //         Get.toNamed(AppPath.liveRoom,
+  //             arguments: AppLiveRoomModel(liveRoom: model, streamUrl: value),
+  //             preventDuplicates: false);
+  //       } else {
+  //         Get.toNamed(AppPath.anchorLiveEnd,
+  //             preventDuplicates: false, arguments: model);
+  //       }
+  //     }
+  //     return model;
+  //   });
+  // }
+
+  // 进入他人的直播间
   Future queryAuthorLiveRoomInfo(int userId) {
     return LiveApi.queryAuthorLiveRoomInfo(userId).then((value) {
       LiveRoomModel model = value;
-      if (model.lockFlag == "1") {
-        password = model.password;
-        Get.dialog(const CustomDialog());
-      } else {
-        if (model.liveState == 2) {
-          Get.toNamed(AppPath.liveRoom,
-              arguments: AppLiveRoomModel(liveRoom: model, streamUrl: value),
-              preventDuplicates: false);
+      CancelFunc cancelFunc = AppToast.loading();
+      LiveApi.getLiveStream(id: model.id ?? 0, password: '${model.password}')
+          .then((value) {
+        mLiveRoom = model;
+        mLiveRoom?.streamUrl = value;
+        if (model.lockFlag == "1") {
+          password = model.password;
+          Get.dialog(const CustomDialog());
         } else {
-          Get.toNamed(AppPath.anchorLiveEnd,
-              preventDuplicates: false, arguments: model);
+          if (model.liveState == 2) {
+            Get.toNamed(AppPath.liveRoom,
+                arguments: AppLiveRoomModel(liveRoom: model, streamUrl: value),
+                preventDuplicates: false);
+          } else {
+            Get.toNamed(AppPath.anchorLiveEnd,
+                preventDuplicates: false, arguments: model);
+          }
         }
-      }
+      }).whenComplete(cancelFunc);
       return model;
     });
   }

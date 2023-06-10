@@ -2,6 +2,7 @@ import 'package:alita/kit/app_fijk_player_kit.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/model/ui/app_live_room_model.dart';
+import 'package:alita/pages/live_list/widgets/live_room_card.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
@@ -16,7 +17,7 @@ import 'package:screenshot/screenshot.dart';
 class LiveRoomController extends AppChatRoomController {
   final AppLiveRoomModel live;
   LiveRoomController({required this.live}) : super(liveRoom: live.liveRoom);
-  FijkPlayer fijkPlayer = FijkPlayerSingleton.instance.fijkPlayer;
+  FijkPlayerManager fijkPlayerManager = FijkPlayerManager();
   bool isRoomOwner = false;
   @override
   UserProfileModel? user;
@@ -40,7 +41,6 @@ class LiveRoomController extends AppChatRoomController {
     // fijkPlayer = FijkPlayer()
     //   ..setDataSource(live.streamUrl, autoPlay: true, showCover: true);
 
-    int? roomId = AppLocalStorage.getInt(AppStorageKey.roomId);
     // if (roomId != liveRoom.id && roomId != null) {
     //   // 换房间
     //   if(isP)
@@ -52,11 +52,12 @@ class LiveRoomController extends AppChatRoomController {
 
     isPip = AppLocalStorage.getBool(AppStorageKey.pip);
     if (isPip == false) {
-      fijkPlayer = FijkPlayer()
-        ..setDataSource(live.streamUrl, autoPlay: true, showCover: true);
-      fijkPlayer.addListener(() {
-        if (fijkPlayer.state == FijkState.completed ||
-            fijkPlayer.state == FijkState.error) {
+      fijkPlayerManager.setFijkPlayer('${mLiveRoom?.streamUrl}');
+      // fijkPlayer = FijkPlayer()
+      //   ..setDataSource(live.streamUrl, autoPlay: true, showCover: true);
+      fijkPlayerManager.fijkPlayer.addListener(() {
+        if (fijkPlayerManager.fijkPlayer.state == FijkState.completed ||
+            fijkPlayerManager.fijkPlayer.state == FijkState.error) {
           // 直播已结束
           AppToast.alert(message: '直播已结束');
           isPip = AppLocalStorage.getBool(AppStorageKey.pip);
@@ -73,8 +74,8 @@ class LiveRoomController extends AppChatRoomController {
   void onClose() {
     isPip = AppLocalStorage.getBool(AppStorageKey.pip);
     if (isPip == false) {
-      fijkPlayer.pause();
-      fijkPlayer.release();
+      fijkPlayerManager.fijkPlayer.pause();
+      fijkPlayerManager.fijkPlayer.release();
       onExitChatRoom();
     }
     super.onClose();
