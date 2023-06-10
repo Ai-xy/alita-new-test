@@ -5,6 +5,7 @@ import 'package:alita/pages/home/home_binding.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_in_app_pip/flutter_in_app_pip.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +14,7 @@ import 'router/app_router.dart';
 import 'translation/app_translation.dart';
 
 void main() {
-  InitializerManager.initialize(AppEnv.dev).whenComplete(() {
+  InitializerManager.initialize(AppEnv.dev).whenComplete(() async {
     runApp(const MyApp());
   });
 }

@@ -40,6 +40,8 @@ import 'package:alita/pages/set_profile/set_profile_binding.dart';
 import 'package:alita/pages/set_profile/set_profile_page.dart';
 import 'package:alita/pages/start_live/start_live_binding.dart';
 import 'package:alita/pages/start_live/start_live_page.dart';
+import 'package:alita/pages/user_profile/user_profile_binding.dart';
+import 'package:alita/pages/user_profile/user_profile_page.dart';
 import 'package:alita/pages/vip/vip_page.dart';
 import 'package:alita/pages/wallet/wallet_binding.dart';
 import 'package:alita/pages/wallet/wallet_page.dart';
@@ -96,7 +98,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.editProfile,
-      page: () =>  EditProfilePage(),
+      page: () => EditProfilePage(),
     ),
     GetPage(
       name: AppPath.setMySignature,
@@ -114,7 +116,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.sessionList,
-      page: () =>  SessionListPage(),
+      page: () => SessionListPage(),
       binding: SessionListBinding(),
     ),
     GetPage(
@@ -170,6 +172,11 @@ abstract class AppRouter {
       name: AppPath.addMoments,
       page: () => const CreateMomentsView(),
       binding: CreateMomentsBinding(),
+    ),
+    GetPage(
+      name: AppPath.userProfile,
+      page: () => UserProfilePage(),
+      binding: UserProfileBinding(),
     ),
   ];
 }

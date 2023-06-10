@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:alita/R/app_color.dart';
@@ -6,7 +7,9 @@ import 'package:alita/R/app_icon.dart';
 import 'package:alita/R/app_text_style.dart';
 import 'package:alita/api/moment_api.dart';
 import 'package:alita/base/base_app_future_controller.dart';
+import 'package:alita/http/http.dart';
 import 'package:alita/kit/app_date_time_kit.dart';
+import 'package:alita/kit/app_nim_kit.dart';
 import 'package:alita/model/api/dynamic_comment_model.dart';
 import 'package:alita/model/api/moment_model.dart';
 import 'package:alita/model/ui/app_gallery_model.dart';
@@ -18,7 +21,9 @@ import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_bottom_input_field.dart';
 import 'package:alita/widgets/app_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -31,6 +36,10 @@ class _MomentController extends BaseAppFutureLoadStateController {
 
   bool get liked => moment.likeFlag == 1;
 
+  bool loading = false;
+
+  String trans = '';
+
   @override
   Future loadData({Map? params}) {
     return MomentApi.getCommentList(momentId: '${moment.id}').then((value) {
@@ -40,7 +49,7 @@ class _MomentController extends BaseAppFutureLoadStateController {
 
   Future comment() {
     return Get.bottomSheet(AppBottomInputField(
-      onSubmitted: (String s,{String? giftUrl,String? giftNum}) {
+      onSubmitted: (String s, {String? giftUrl, String? giftNum}) {
         return MomentApi.comment(content: s, momentId: '${moment.id}')
             .then((value) {
           moment.commentNum = (moment.commentNum ?? 0) + 1;
@@ -101,7 +110,7 @@ class MomentCard extends StatelessWidget {
             return Container(
               padding: EdgeInsets.only(
                   left: 16.w, right: 16.w, top: 8.h, bottom: 12.h),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColor.white,
               ),
               child: Column(
@@ -168,22 +177,62 @@ class MomentCard extends StatelessWidget {
                   ),
                   Gap(14.h),
                   Text('${moment.textContent}', style: AppTextStyle.bodyMedium),
-                  // Gap(6.h),
-                  // Row(
-                  //   children: [
-                  //     Image.asset(
-                  //       AppIcon.translation.uri,
-                  //       width: 14.r,
-                  //       height: 14.r,
-                  //     ),
-                  //     Gap(2.w),
-                  //     Text(
-                  //       AppMessage.viewTranslations.tr,
-                  //       style:
-                  //           TextStyle(fontSize: 12.sp, color: AppColor.lightBlue),
-                  //     ),
-                  //   ],
-                  // ),
+                  _.trans == ''
+                      ? Container()
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Gap(6.w),
+                            Container(
+                              margin: EdgeInsets.only(bottom: 6.w),
+                              height: 1,
+                              color: const Color.fromRGBO(51, 51, 51, .2),
+                            ),
+                            Flexible(
+                              child: Text(
+                                _.trans,
+                                style: TextStyle(
+                                    fontSize: 14.sp, color: Colors.grey),
+                              ),
+                            ),
+                          ],
+                        ),
+                  Gap(9.h),
+                  _.loading
+                      ? SizedBox(
+                          width: 14.r,
+                          height: 14.r,
+                          child: const CircularProgressIndicator())
+                      : GestureDetector(
+                          onTap: () async {
+                            _.loading = true;
+                            _.update();
+                            await MomentApi.translate('${moment.textContent}')
+                                .then((value) {
+                              _.trans = value;
+                              _.update();
+                            }).whenComplete(() {
+                              _.loading = false;
+                              _.update();
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                AppIcon.translation.uri,
+                                width: 14.r,
+                                height: 14.r,
+                              ),
+                              Gap(2.w),
+                              Text(
+                                AppMessage.viewTranslations.tr,
+                                style: TextStyle(
+                                    fontSize: 12.sp, color: AppColor.lightBlue),
+                              ),
+                            ],
+                          ),
+                        ),
                   if (moment.imgUrls?.isNotEmpty == true) ...[
                     Gap(10.h),
                     GridView.builder(
@@ -292,7 +341,6 @@ class MomentCard extends StatelessWidget {
                       )
                     ],
                   ),
-
                   if (_.moment.commentList.isNotEmpty) ...[
                     const Divider(
                       color: Color(0xFFE2E2E2),

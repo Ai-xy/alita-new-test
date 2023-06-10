@@ -16,12 +16,7 @@ class AboutUsController extends BaseAppController {
       AppLocalStorage.remove(AppStorageKey.user),
       AppLocalStorage.remove(AppStorageKey.user)
     ]).then((value) {
-      Get.delete<HomeController>();
-      Get.delete<LiveListController>();
-      Get.delete<HotLiveController>();
-      Get.delete<FollowController>();
-      Get.delete<UserProfileController>();
-      Get.delete<SessionListController>();
+
       Get.offAllNamed(AppPath.login);
     });
   }

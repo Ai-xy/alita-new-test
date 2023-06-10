@@ -307,7 +307,6 @@ class UserProfilePage extends StatelessWidget {
                             Get.toNamed(AppPath.chat,
                                 arguments: logic.conversationTipList[0]);
                           });
-
                         }),
                     ProfileTileModel(
                         label: AppMessage.problemFeedback.tr,

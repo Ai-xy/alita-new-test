@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:alita/config/app_config.dart';
+import 'package:alita/http/http.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/manager/auth_manager.dart';
 import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/pages/session_list/session_list_controller.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
@@ -251,4 +255,6 @@ class AppNimKit {
       return true;
     }
   }
+
+
 }

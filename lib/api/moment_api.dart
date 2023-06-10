@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:alita/http/http.dart';
 import 'package:alita/model/api/dynamic_comment_model.dart';
 import 'package:alita/model/api/moment_model.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 abstract class MomentApi {
   static Future<List<MomentModel>?> getMomentList(
@@ -131,5 +135,39 @@ abstract class MomentApi {
   static Future delete(String id) {
     return Http.instance.post(ApiRequest('/api/expand/friendsCircle/del',
         formData: {"searchValue": id}));
+  }
+
+  /// 翻译
+  static Future<String> translate(String text) async {
+    String translations = '';
+    try {
+      Response response = await Dio().post(
+        '${dotenv.env['IM_TRAN_URL']}',
+        data: [
+          {
+            "Text": text,
+          }
+        ],
+        options: Options(
+          headers: {
+            "Content-Type": 'application/json;charset=UTF-8',
+            "Ocp-Apim-Subscription-Key":
+                dotenv.env['IM_TRAN_KEY']!, // 设置 content-length.
+          },
+        ),
+      );
+      print('翻译return');
+      print(response.data);
+      List<dynamic> result;
+      if (response.data is String) {
+        result = jsonDecode(response.data);
+      } else {
+        result = response.data;
+      }
+      translations = '${result[0]['translations'][0]['text']}';
+    } catch (e) {
+      translations = '';
+    }
+    return translations;
   }
 }

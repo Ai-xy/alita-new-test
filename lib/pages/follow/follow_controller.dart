@@ -19,7 +19,6 @@ class FollowController extends BaseAppFutureLoadStateController {
     super.onInit();
   }
 
-
   @override
   Future loadData({Map? params}) {
     return MomentApi.getMomentList().then((value) {
