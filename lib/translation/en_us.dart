@@ -130,6 +130,7 @@ final Map<AppMessage, String> enUS = {
   AppMessage.data: 'Data',
   AppMessage.edit: 'Edit',
   AppMessage.uploadCoverTip: 'Please upload cover',
+  AppMessage.uploadTopicTip: 'Please upload topic',
   AppMessage.flip: 'Flip',
   AppMessage.screenshots: 'Screenshots',
   AppMessage.recordScreen: 'Record screens',

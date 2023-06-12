@@ -132,6 +132,7 @@ enum AppMessage {
   data,
   edit,
   uploadCoverTip,
+  uploadTopicTip,
   flip,
   screenshots,
   recordScreen,

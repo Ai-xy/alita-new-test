@@ -41,7 +41,7 @@ class SessionCard extends GetView<SessionListController> {
         return Slidable(
           endActionPane: ActionPane(
             extentRatio: 0.2,
-            motion: StretchMotion(),
+            motion: const StretchMotion(),
             children: [
               AppSlideAction(
                 icon: AppIcon.delete,

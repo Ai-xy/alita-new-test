@@ -10,10 +10,12 @@ import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:rtmp_broadcaster/camera.dart';
 
 class StartLiveController extends BaseAppController with AppLiveBinding {
+  TextEditingController textController = TextEditingController();
   CameraController? cameraController;
   String? cover;
   @override
@@ -53,6 +55,10 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
       AppToast.alert(message: AppMessage.uploadCoverTip.tr);
       return Future.error(AppMessage.uploadCoverTip.tr);
     }
+    if (textController.text == '') {
+      AppToast.alert(message: AppMessage.uploadTopicTip.tr);
+      return Future.error(AppMessage.uploadTopicTip.tr);
+    }
     if (liveRoomType == AppLiveRoomType.passwordRoom &&
         !(RegExp(r'^\d{4}$').stringMatch(password) == password)) {
       AppToast.alert(message: AppMessage.enterLiveRoomPassword.tr);
@@ -60,13 +66,14 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
     }
 
     return LiveApi.createLiveRoom(
-      cover: '$cover',
-      isLocked: liveRoomType == AppLiveRoomType.passwordRoom,
-      password: password,
-      userIcon: '${user?.icon}',
-      userId: user?.userId ?? 0,
-      userNickname: user?.nickname ?? '',
-    ).then((value) {
+            cover: '$cover',
+            isLocked: liveRoomType == AppLiveRoomType.passwordRoom,
+            password: password,
+            userIcon: '${user?.icon}',
+            userId: user?.userId ?? 0,
+            userNickname: user?.nickname ?? '',
+            liveRoomName: textController.text)
+        .then((value) {
       Log.d('创建的房间信息 ${value.toJson()}');
       if (cameraController?.value.isInitialized != true) {}
       LiveRoomModel liveRoomInfo = LiveRoomModel();
@@ -85,6 +92,7 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
   @override
   void onClose() {
     cameraController?.dispose();
+    textController.dispose();
     super.onClose();
   }
 }

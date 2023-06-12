@@ -78,7 +78,7 @@ class LiveListPage extends StatelessWidget {
                             ),
                           );
                         },
-                        itemCount: _.tagList.length,
+                        itemCount: 1 ?? _.tagList.length,
                       ),
                     )
                   ],

@@ -84,13 +84,12 @@ class MyLiveRoomPage extends StatelessWidget {
                             onTap: () {
                               _.saveScreenshot(context);
                             }),
-                        AppLiveActionModel(
-                            icon: AppIcon.anchorRecordScreen.uri,
-                            label: AppMessage.recordScreen.tr,
-                            onTap: () {
-                              AppToast.alert(message: 'start record');
-                              _.startRecording();
-                            }),
+                        // AppLiveActionModel(
+                        //     icon: AppIcon.anchorRecordScreen.uri,
+                        //     label: AppMessage.recordScreen.tr,
+                        //     onTap: () {
+                        //       _.startRecording();
+                        //     }),
                         AppLiveActionModel(
                             icon: AppIcon.anchorClearScreen.uri,
                             label: AppMessage.clearTheScreen.tr,
@@ -105,40 +104,40 @@ class MyLiveRoomPage extends StatelessWidget {
                               Get.toNamed(AppPath.blockList,
                                   arguments: _.liveRoom);
                             }),
-                        AppLiveActionModel(
-                            icon: AppIcon.liveRoomMore.uri,
-                            label: AppMessage.more.tr),
+                        // AppLiveActionModel(
+                        //     icon: AppIcon.liveRoomMore.uri,
+                        //     label: AppMessage.more.tr),
                       ],
                     ));
                   },
                 ),
               ),
-              _.isRecording
-                  ? Positioned(
-                      right: 16.w,
-                      top: 200.w,
-                      child: GestureDetector(
-                        onTap: () {
-                          _.stopRecording();
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(50.r),
-                          child: Container(
-                            height: 60.w,
-                            width: 60.w,
-                            color: Colors.red,
-                            child: Center(
-                              child: Text(
-                                'stop\nrecord',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14.sp),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ))
-                  : Container()
+              // _.isRecording
+              //     ? Positioned(
+              //         right: 16.w,
+              //         top: 200.w,
+              //         child: GestureDetector(
+              //           onTap: () {
+              //             _.stopRecording();
+              //           },
+              //           child: ClipRRect(
+              //             borderRadius: BorderRadius.circular(50.r),
+              //             child: Container(
+              //               height: 60.w,
+              //               width: 60.w,
+              //               color: Colors.red,
+              //               child: Center(
+              //                 child: Text(
+              //                   'stop\nrecord',
+              //                   style: TextStyle(
+              //                       color: Colors.white, fontSize: 14.sp),
+              //                   textAlign: TextAlign.center,
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ))
+              //     : Container()
             ],
           ),
         );

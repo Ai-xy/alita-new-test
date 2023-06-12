@@ -85,7 +85,7 @@ dependencies:
   # 截屏
   image_gallery_saver: ^2.0.1
   # 屏幕录制
-  flutter_screen_recording: ^2.0.0
+  ##flutter_screen_recording: ^2.0.0
   # 录制结果保存到相册
   flutter_cache_manager: ^3.3.0
   flutter_dotenv: 5.0.2

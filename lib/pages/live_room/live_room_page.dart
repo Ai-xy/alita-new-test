@@ -110,17 +110,17 @@ class LiveRoomPage extends GetView<LiveRoomController> {
                                 onTap: () {
                                   _.saveScreenshot(context);
                                 }),
-                            AppLiveActionModel(
-                                icon: AppIcon.recordScreen.uri,
-                                label: 'Record screens'),
+                            // AppLiveActionModel(
+                            //     icon: AppIcon.recordScreen.uri,
+                            //     label: 'Record screens'),
                             AppLiveActionModel(
                                 icon: AppIcon.clearScreen.uri,
                                 label: 'Clear the screen',
                                 onTap: () {
                                   _.messageList.clear();
                                 }),
-                            AppLiveActionModel(
-                                icon: AppIcon.liveRoomMore.uri, label: 'More'),
+                            // AppLiveActionModel(
+                            //     icon: AppIcon.liveRoomMore.uri, label: 'More'),
                           ],
                         ));
                       },

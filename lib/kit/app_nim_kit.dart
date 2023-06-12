@@ -79,7 +79,6 @@ class AppNimKit {
         Log.i('IM登录结果$value', tag: tag);
         if (value.isSuccess) {
           AppToast.alert(message: 'login success');
-          //logic.loadData();
           AuthManager().login();
           AppLocalStorage.setBool(AppStorageKey.pip, false);
           return true;

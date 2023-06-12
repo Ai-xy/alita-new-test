@@ -8,7 +8,6 @@ import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_chatroom/app_chatroom_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_screen_recording/flutter_screen_recording.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rtmp_broadcaster/camera.dart';
@@ -129,40 +128,40 @@ class MyLiveRoomController extends AppChatRoomController
     }
   }
 
-  bool isRecording = false;
-  String? videoPath;
-
-  void startRecording() async {
-    try {
-      await FlutterScreenRecording.startRecordScreen('alita_record');
-      isRecording = true;
-      update();
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  void stopRecording() async {
-    try {
-      String path = await FlutterScreenRecording.stopRecordScreen;
-      isRecording = false;
-      videoPath = path;
-      update();
-      _saveToGallery(path).then((value) {
-        AppToast.alert(
-            message:
-                'Screen recording has been successfully saved to the album');
-      });
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  /// 保存至相册
-  Future<void> _saveToGallery(String path) async {
-    if (await Permission.storage.request().isGranted) {
-      var file = await DefaultCacheManager().getSingleFile(path);
-      await ImageGallerySaver.saveFile(file.path);
-    }
-  }
+  // bool isRecording = false;
+  // String? videoPath;
+  //
+  // void startRecording() async {
+  //   try {
+  //     await FlutterScreenRecording.startRecordScreen('alita_record');
+  //     isRecording = true;
+  //     update();
+  //   } catch (error) {
+  //     print(error);
+  //   }
+  // }
+  //
+  // void stopRecording() async {
+  //   try {
+  //     String path = await FlutterScreenRecording.stopRecordScreen;
+  //     isRecording = false;
+  //     videoPath = path;
+  //     update();
+  //     _saveToGallery(path).then((value) {
+  //       AppToast.alert(
+  //           message:
+  //               'Screen recording has been successfully saved to the album');
+  //     });
+  //   } catch (error) {
+  //     print(error);
+  //   }
+  // }
+  //
+  // /// 保存至相册
+  // Future<void> _saveToGallery(String path) async {
+  //   if (await Permission.storage.request().isGranted) {
+  //     var file = await DefaultCacheManager().getSingleFile(path);
+  //     await ImageGallerySaver.saveFile(file.path);
+  //   }
+  // }
 }

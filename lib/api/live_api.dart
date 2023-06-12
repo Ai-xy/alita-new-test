@@ -62,14 +62,14 @@ abstract class LiveApi {
         .then((value) => '${value.data}');
   }
 
-  static Future<LiveRoomModel> createLiveRoom({
-    required String cover,
-    String? password,
-    required bool isLocked,
-    required String userIcon,
-    required int userId,
-    required String userNickname,
-  }) {
+  static Future<LiveRoomModel> createLiveRoom(
+      {required String cover,
+      String? password,
+      required bool isLocked,
+      required String userIcon,
+      required int userId,
+      required String userNickname,
+      required String liveRoomName}) {
     return Http.instance
         .post(ApiRequest('/api/expand/wearLive/saveLiveRoom', formData: {
       'coverImg': cover,
@@ -77,7 +77,7 @@ abstract class LiveApi {
       'homeownerId': userId,
       'homeownerNickname': userNickname,
       'label': 'Hot',
-      'liveRoomName': 'test',
+      'liveRoomName': liveRoomName,
       'liveState': 0,
       'lockFlag': '${isLocked ? 1 : 0}',
       'password': password,
@@ -105,10 +105,11 @@ abstract class LiveApi {
   }
 
   static Future queryMyLiveRoomInfo(String searchValue) {
-    return Http.instance.post(ApiRequest(
-        '/api/expand/wearLive/queryMyRoomGiftStat',
-        formData: {'searchValue': searchValue})).then((value) {
-          return value.data;
+    return Http.instance
+        .post(ApiRequest('/api/expand/wearLive/queryMyRoomGiftStat',
+            formData: {'searchValue': searchValue}))
+        .then((value) {
+      return value.data;
     });
   }
 
