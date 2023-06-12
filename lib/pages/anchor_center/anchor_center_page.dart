@@ -105,7 +105,7 @@ class AnchorCenterPage extends StatelessWidget {
                               child: Column(
                                 children: [
                                   Text(
-                                    '5650',
+                                    '${_.incomeNum}',
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: AppFontWeight.bold,

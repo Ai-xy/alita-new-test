@@ -104,10 +104,12 @@ abstract class LiveApi {
     }).then((value) => value.giftList);
   }
 
-  static Future queryMyLiveRoomInfo() {
+  static Future queryMyLiveRoomInfo(String searchValue) {
     return Http.instance.post(ApiRequest(
         '/api/expand/wearLive/queryMyRoomGiftStat',
-        formData: {'searchValue': 'gift|follower|duration'}));
+        formData: {'searchValue': searchValue})).then((value) {
+          return value.data;
+    });
   }
 
   /// 查询其他用户直播间信息

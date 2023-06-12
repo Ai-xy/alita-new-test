@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- Android Q(10.0) 及后续版本还需要额外添加以下权限 -->
     <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />

@@ -41,6 +41,7 @@ class RegisterController extends BaseAppController with AppAuthBinding {
           AppToast.alert(message: AppMessage.enterPasswordAgainHint.tr));
     }
     return LoginApi.login(email: email, password: password).then((user) {
+      print("保存用户信息前的用户信息${user.toJson()}");
       return saveUserInfo(user);
     }).then((value) {
       Get.offAllNamed(AppPath.setProfile);

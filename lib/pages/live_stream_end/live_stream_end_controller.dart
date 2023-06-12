@@ -4,7 +4,7 @@ import 'package:alita/base/base_app_controller.dart';
 class LiveStreamEndController extends BaseAppController {
   @override
   void onInit() {
-    LiveApi.queryMyLiveRoomInfo();
+   // LiveApi.queryMyLiveRoomInfo();
     super.onInit();
   }
 }

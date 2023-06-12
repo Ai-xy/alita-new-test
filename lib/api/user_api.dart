@@ -1,9 +1,11 @@
 import 'package:alita/enum/app_gender.dart';
 import 'package:alita/generated/json/base/json_convert_content.dart';
 import 'package:alita/http/http.dart';
+import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/user_friend_entity.dart';
 import 'package:alita/model/api/user_profile_model.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:get/get.dart';
@@ -207,6 +209,25 @@ abstract class UserApi {
       } else {
         AppToast.alert(message: '${value.message}');
         Get.back();
+      }
+    });
+  }
+
+  static Future deleteAccount() {
+    return Http.instance
+        .post(ApiRequest('/api/user/deleteAccount'))
+        .then((value) {
+      if (value.code == '0000') {
+        AppToast.alert(message: 'Success');
+        return Future.wait([
+          AppLocalStorage.remove(AppStorageKey.token),
+          AppLocalStorage.remove(AppStorageKey.user),
+          AppLocalStorage.remove(AppStorageKey.user)
+        ]).then((value) {
+          Get.offAllNamed(AppPath.login);
+        });
+      } else {
+        AppToast.alert(message: '${value.message}');
       }
     });
   }

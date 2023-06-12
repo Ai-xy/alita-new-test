@@ -37,7 +37,7 @@ class SetProfilePage extends GetView<SetProfileController> {
                   offset: Offset(16.w, 0),
                   child: GestureDetector(
                     onTap: () {
-                      Get.offAllNamed(AppPath.home);
+                      _.skip();
                     },
                     behavior: HitTestBehavior.opaque,
                     child: Text(
