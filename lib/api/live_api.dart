@@ -120,7 +120,9 @@ abstract class LiveApi {
             formData: {'searchValue': userId}))
         .then((value) {
       LiveRoomModel model = LiveRoomModel();
-      model = LiveRoomModel.fromJson(value.data);
+      if(value.data!=null){
+        model = LiveRoomModel.fromJson(value.data);
+      }
       Log.d('该用户房间信息${model.toJson()}');
       return model;
     });

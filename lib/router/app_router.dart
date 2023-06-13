@@ -28,6 +28,8 @@ import 'package:alita/pages/login/login_binding.dart';
 import 'package:alita/pages/login/login_page.dart';
 import 'package:alita/pages/my_live_room/my_live_room_binding.dart';
 import 'package:alita/pages/my_live_room/my_live_room_page.dart';
+import 'package:alita/pages/report_common/report_common_binding.dart';
+import 'package:alita/pages/report_common/report_common_page.dart';
 import 'package:alita/pages/session_list/session_list_binding.dart';
 import 'package:alita/pages/session_list/session_list_page.dart';
 import 'package:alita/pages/my_following/my_following_binding.dart';
@@ -88,7 +90,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.liveRoom,
-      page: () => LiveRoomPage(),
+      page: () => const LiveRoomPage(),
       binding: LiveRoomBinding(),
     ),
     GetPage(
@@ -98,7 +100,7 @@ abstract class AppRouter {
     ),
     GetPage(
       name: AppPath.editProfile,
-      page: () => EditProfilePage(),
+      page: () => const EditProfilePage(),
     ),
     GetPage(
       name: AppPath.setMySignature,
@@ -177,6 +179,11 @@ abstract class AppRouter {
       name: AppPath.userProfile,
       page: () => UserProfilePage(),
       binding: UserProfileBinding(),
+    ),
+    GetPage(
+      name: AppPath.reportCommon,
+      page: () => const ReportCommonPage(),
+      binding: ReportCommonBinding(),
     ),
   ];
 }

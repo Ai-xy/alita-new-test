@@ -77,27 +77,51 @@ class FollowPage extends StatelessWidget {
             ),
           ),
           body: TabBarView(
-              children: List.generate(
-                  2,
-                  (index) => RefreshIndicator(
-                        onRefresh: () {
-                          return _.loadData();
-                        },
-                        child: ListView.separated(
-                          padding: EdgeInsets.only(bottom: 10.h),
-                          separatorBuilder: (BuildContext context, int i) {
-                            return Gap(10.h);
-                          },
-                          itemBuilder: (BuildContext context, int i) {
-                            return MomentCard(
-                              moment: _.momentList[i],
-                              isMe: false,
-                              followController: _,
-                            );
-                          },
-                          itemCount: _.momentList.length,
-                        ),
-                      ))),
+              children: List.generate(2, (index) {
+            if (index == 0) {
+              return RefreshIndicator(
+                onRefresh: () {
+                  return _.loadData();
+                },
+                child: ListView.separated(
+                  padding: EdgeInsets.only(bottom: 10.h),
+                  separatorBuilder: (BuildContext context, int i) {
+                    return Gap(10.h);
+                  },
+                  itemBuilder: (BuildContext context, int i) {
+                    if (_.momentList[i].followFlag == 0) {
+                      return Container();
+                    }
+                    return MomentCard(
+                      moment: _.momentList[i],
+                      isMe: false,
+                      followController: _,
+                    );
+                  },
+                  itemCount: _.momentList.length,
+                ),
+              );
+            }
+            return RefreshIndicator(
+              onRefresh: () {
+                return _.loadData();
+              },
+              child: ListView.separated(
+                padding: EdgeInsets.only(bottom: 10.h),
+                separatorBuilder: (BuildContext context, int i) {
+                  return Gap(10.h);
+                },
+                itemBuilder: (BuildContext context, int i) {
+                  return MomentCard(
+                    moment: _.momentList[i],
+                    isMe: false,
+                    followController: _,
+                  );
+                },
+                itemCount: _.momentList.length,
+              ),
+            );
+          })),
         ),
       );
     });

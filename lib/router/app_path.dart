@@ -25,6 +25,7 @@ abstract class AppPath {
   static const String liveAnchorSheet = '/liveAnchorSheet';
   static const String addMoments = '/addMoments';
   static const String userProfile = '/userProfile';
+  static const String reportCommon = '/reportCommon';
 
 
 

@@ -46,6 +46,7 @@ class AnchorProfileController extends BaseAppController {
         .then((value) {
           userDetail = UserProfileModel.fromJson(value.data);
           Log.d('获取到的用户信息：${value.data}');
+          userInfo = UserProfileModel.fromJson(value.data);
           if (userInfo?.userId == user?.userId) {
             isMe = true;
           }

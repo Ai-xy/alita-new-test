@@ -77,7 +77,7 @@ class SetProfilePage extends GetView<SetProfileController> {
                     )),
                 Gap(24.h),
                 AppTextField(
-                  hintText: AppMessage.bose.tr,
+                  hintText: AppMessage.nickname.tr,
                   onChanged: _.setNickname,
                 ),
                 Gap(17.h),

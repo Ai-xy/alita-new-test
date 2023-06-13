@@ -142,4 +142,9 @@ final Map<AppMessage, String> enUS = {
   AppMessage.getDiamonds: 'Get Diamonds',
   AppMessage.gifitingUsers: 'Gifting users',
   AppMessage.newFollowers: 'New Followers',
+  AppMessage.report: 'Report',
+  AppMessage.politicalSensitivity: 'Political sensitivity',
+  AppMessage.violentPornography: 'Violent pornography',
+  AppMessage.advertisingHarassment: 'Advertising harassment',
+  AppMessage.reportContentHint: 'Please enter what you would like to feedback'
 };

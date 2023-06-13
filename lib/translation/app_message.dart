@@ -144,4 +144,9 @@ enum AppMessage {
   getDiamonds,
   gifitingUsers,
   newFollowers,
+  report,
+  politicalSensitivity,
+  violentPornography,
+  advertisingHarassment,
+  reportContentHint
 }

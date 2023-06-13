@@ -116,6 +116,24 @@ abstract class UserApi {
     });
   }
 
+  static Future report({
+    required int userId,
+    required String feedback,
+    required String feedbackType,
+  }) {
+    return Http.instance
+        .post(ApiRequest('/api/feedback/feedbackVideo', formData: {
+      "beBlockUid": userId,
+      "block": 2,
+      "feedbackType": feedbackType,
+      "suggestion": feedback,
+      "url": ""
+    }))
+        .then((value) {
+      AppToast.alert(message: '${value.message}');
+    });
+  }
+
   static Future followUser({required int userId}) {
     return Http.instance
         .post(ApiRequest('/api/user/followUser', formData: {

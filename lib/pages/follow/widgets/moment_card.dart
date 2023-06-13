@@ -5,22 +5,29 @@ import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
 import 'package:alita/R/app_text_style.dart';
+import 'package:alita/api/live_api.dart';
 import 'package:alita/api/moment_api.dart';
 import 'package:alita/base/base_app_future_controller.dart';
 import 'package:alita/http/http.dart';
 import 'package:alita/kit/app_date_time_kit.dart';
 import 'package:alita/kit/app_nim_kit.dart';
 import 'package:alita/model/api/dynamic_comment_model.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/moment_model.dart';
+import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/model/ui/app_gallery_model.dart';
+import 'package:alita/model/ui/app_live_room_model.dart';
 import 'package:alita/pages/anchor_profile/anchor_profile_controller.dart';
 import 'package:alita/pages/follow/follow_controller.dart';
+import 'package:alita/pages/live_list/widgets/live_room_card.dart';
 import 'package:alita/pages/photo_viewer/photo_viewer_page.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:alita/widgets/app_bottom_input_field.dart';
 import 'package:alita/widgets/app_image.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -76,6 +83,37 @@ class _MomentController extends BaseAppFutureLoadStateController {
       Get.back();
     }).whenComplete(update);
   }
+
+  Future queryAuthorLiveRoomInfo(int userId) {
+    return LiveApi.queryAuthorLiveRoomInfo(userId).then((value) {
+      if (value != null) {
+        LiveRoomModel model = value;
+        CancelFunc cancelFunc = AppToast.loading();
+        LiveApi.getLiveStream(id: model.id ?? 0, password: '${model.password}')
+            .then((value) {
+          mLiveRoom = model;
+          mLiveRoom?.streamUrl = value;
+          if (model.lockFlag == "1") {
+            password = model.password;
+            Get.dialog(const CustomDialog());
+          } else {
+            if (model.liveState == 2) {
+              Get.toNamed(AppPath.liveRoom,
+                  arguments:
+                      AppLiveRoomModel(liveRoom: model, streamUrl: value),
+                  preventDuplicates: false);
+            } else {
+              AppToast.alert(
+                  message: 'The current user is not in the live stream');
+            }
+          }
+        }).whenComplete(cancelFunc);
+        return model;
+      } else {
+        AppToast.alert(message: 'The current user is not in the live stream');
+      }
+    });
+  }
 }
 
 class MomentCard extends StatelessWidget {
@@ -118,12 +156,19 @@ class MomentCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      AppImage(
-                        '${moment.icon}',
-                        borderRadius: BorderRadius.circular(24.r),
-                        width: 48.r,
-                        height: 48.r,
-                        fit: BoxFit.fill,
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(AppPath.anchorProfile,
+                              arguments:
+                                  UserProfileModel(userId: _.moment.userId));
+                        },
+                        child: AppImage(
+                          '${moment.icon}',
+                          borderRadius: BorderRadius.circular(24.r),
+                          width: 48.r,
+                          height: 48.r,
+                          fit: BoxFit.fill,
+                        ),
                       ),
                       Gap(10.w),
                       Expanded(
@@ -157,20 +202,26 @@ class MomentCard extends StatelessWidget {
                                   border: Border.all(
                                       color: AppColor.borderColor
                                           .withOpacity(.37))),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    AppIcon.living.uri,
-                                    width: 18.r,
-                                    height: 18.r,
-                                  ),
-                                  Gap(8.w),
-                                  Text(
-                                    AppMessage.live.tr,
-                                    style: TextStyle(
-                                        fontSize: 12.sp, color: AppColor.grey),
-                                  ),
-                                ],
+                              child: GestureDetector(
+                                onTap: () {
+                                  _.queryAuthorLiveRoomInfo(moment.userId!);
+                                },
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      AppIcon.living.uri,
+                                      width: 18.r,
+                                      height: 18.r,
+                                    ),
+                                    Gap(8.w),
+                                    Text(
+                                      AppMessage.live.tr,
+                                      style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: AppColor.grey),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                     ],
@@ -276,68 +327,80 @@ class MomentCard extends StatelessWidget {
                   ],
                   Gap(16.h),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            HookBuilder(builder: (context) {
-                              return GestureDetector(
-                                onTap: () {
-                                  int flag = moment.likeFlag!;
-                                  if (flag == 0) {
-                                    flag = 1;
-                                  } else {
-                                    flag = 0;
-                                  }
-                                  _.like(flag).then((value) {
-                                    if (isMe) {
-                                      anchorProfileController
-                                          ?.loadMomentsData();
-                                    } else {
-                                      if (followController != null) {
-                                        followController?.loadData();
-                                      } else {}
-                                    }
-                                  });
-                                },
-                                behavior: HitTestBehavior.opaque,
-                                child: Image.asset(
-                                  moment.likeFlag == 1
-                                      ? AppIcon.thumbActive.uri
-                                      : AppIcon.thumb.uri,
+                      Row(
+                        children: [
+                          GestureDetector(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                HookBuilder(builder: (context) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      int flag = moment.likeFlag!;
+                                      if (flag == 0) {
+                                        flag = 1;
+                                      } else {
+                                        flag = 0;
+                                      }
+                                      _.like(flag).then((value) {
+                                        if (isMe) {
+                                          anchorProfileController
+                                              ?.loadMomentsData();
+                                        } else {
+                                          if (followController != null) {
+                                            followController?.loadData();
+                                          } else {}
+                                        }
+                                      });
+                                    },
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Image.asset(
+                                      moment.likeFlag == 1
+                                          ? AppIcon.thumbActive.uri
+                                          : AppIcon.thumb.uri,
+                                      width: 24.r,
+                                      height: 24.r,
+                                    ),
+                                  );
+                                }),
+                                Gap(4.w),
+                                Transform.translate(
+                                    offset: Offset(0, 0.5.h),
+                                    child: Text('${moment.likeNum}',
+                                        style: AppTextStyle.bodyMedium)),
+                              ],
+                            ),
+                          ),
+                          Gap(30.w),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _.comment,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AppIcon.comment.uri,
                                   width: 24.r,
                                   height: 24.r,
                                 ),
-                              );
-                            }),
-                            Gap(4.w),
-                            Transform.translate(
-                                offset: Offset(0, 0.5.h),
-                                child: Text('${moment.likeNum}',
-                                    style: AppTextStyle.bodyMedium)),
-                          ],
-                        ),
-                      ),
-                      Gap(30.w),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _.comment,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              AppIcon.comment.uri,
-                              width: 24.r,
-                              height: 24.r,
+                                Gap(4.w),
+                                Transform.translate(
+                                    offset: Offset(0, 0.5.h),
+                                    child: Text('${_.moment.commentNum}',
+                                        style: AppTextStyle.bodyMedium)),
+                              ],
                             ),
-                            Gap(4.w),
-                            Transform.translate(
-                                offset: Offset(0, 0.5.h),
-                                child: Text('${_.moment.commentNum}',
-                                    style: AppTextStyle.bodyMedium)),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(AppPath.reportCommon,
+                              arguments: _.moment.userId);
+                        },
+                        child: const Icon(Icons.more_vert),
                       )
                     ],
                   ),
