@@ -1,3 +1,4 @@
+import 'package:alita/api/user_api.dart';
 import 'package:alita/kit/app_fijk_player_kit.dart';
 import 'package:alita/local_storage/app_local_storge.dart';
 import 'package:alita/model/api/user_profile_model.dart';
@@ -34,6 +35,7 @@ class LiveRoomController extends AppChatRoomController {
     print(live.streamUrl);
     print(live.liveRoom.toJson());
     getUser();
+    chatRoomGetUserDetail();
     checkIsRoomOwner();
     // fijkPlayer = FijkPlayer()
     //   ..setDataSource('${liveRoom.streamUrl}', autoPlay: true, showCover: true);

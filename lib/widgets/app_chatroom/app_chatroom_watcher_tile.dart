@@ -20,7 +20,8 @@ class AppChatRoomWatcherTile<T extends AppChatRoomController>
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<T>(builder: (_) {
+    return GetBuilder<T>(
+        builder: (_) {
       return SizedBox(
         width: Get.width - 30.w,
         child: Row(
@@ -83,10 +84,17 @@ class AppChatRoomWatcherTile<T extends AppChatRoomController>
                     ],
                   ),
                   const Spacer(),
-                  Image.asset(
-                    AppIcon.follow.uri,
-                    height: 32.h,
-                  ),
+                  _.isFollowed == true
+                      ? Container()
+                      : GestureDetector(
+                          onTap: () {
+                            _.followUser();
+                          },
+                          child: Image.asset(
+                            AppIcon.follow.uri,
+                            height: 32.h,
+                          ),
+                        ),
                 ],
               ),
             ),

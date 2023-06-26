@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alita/api/user_api.dart';
 import 'package:alita/base/base_app_controller.dart';
 import 'package:alita/kit/app_nim_kit.dart';
 import 'package:alita/manager/auth_manager.dart';
@@ -304,7 +305,6 @@ abstract class AppChatRoomController extends BaseAppController {
   }
 
   Future onExitChatRoom() async {
-    AppToast.alert(message: '退出房间');
     memberNum = 0.obs;
     messageList.clear();
     //messageListScrollController.dispose();
@@ -316,5 +316,28 @@ abstract class AppChatRoomController extends BaseAppController {
     }
     NimCore.instance.chatroomService.exitChatroom(yxRoomId);
     Log.d('退出ExitChatRoom', tag: '退出ExitChatRoom');
+  }
+
+  Future chatRoomGetUserDetail() {
+    return UserApi.getUserDetail(userId: liveRoom.homeownerId)
+        .then((value) {
+          if (value.data['followed'] == false) {
+            isFollowed = false;
+            update();
+          }
+          return value;
+        })
+        .catchError((err, s) {})
+        .whenComplete(update);
+  }
+
+  bool isFollowed = true;
+  Future followUser() {
+    return UserApi.followUser(userId: liveRoom.homeownerId ?? -1).then((value) {
+      if (value == true) {
+        isFollowed = true;
+        update();
+      }
+    });
   }
 }

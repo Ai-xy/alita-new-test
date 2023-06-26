@@ -168,19 +168,16 @@ class MyLiveRoomPage extends StatelessWidget {
                               ? controller.chatroomMemberList.length
                               : 3,
                           itemBuilder: (BuildContext context, int index) {
-                            return Positioned(
-                              right: 10.w,
-                              child: Container(
+                            return Container(
+                              height: 40.w,
+                              width: 40.w,
+                              color: Colors.transparent,
+                              child: AppImage(
+                                '${controller.chatroomMemberList[index].avatar}',
                                 height: 40.w,
                                 width: 40.w,
-                                color: Colors.transparent,
-                                child: AppImage(
-                                  '${controller.chatroomMemberList[index].avatar}',
-                                  height: 40.w,
-                                  width: 40.w,
-                                  fit: BoxFit.cover,
-                                  borderRadius: BorderRadius.circular(50.r),
-                                ),
+                                fit: BoxFit.cover,
+                                borderRadius: BorderRadius.circular(50.r),
                               ),
                             );
                           },

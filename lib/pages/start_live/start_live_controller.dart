@@ -81,7 +81,7 @@ class StartLiveController extends BaseAppController with AppLiveBinding {
       liveRoomInfo.homeownerId = user?.userId;
       liveRoomInfo.homeownerNickname = user?.nickname;
       liveRoomInfo.homeownerIcon = user?.icon;
-      liveRoomInfo.liveRoomName = 'test';
+      liveRoomInfo.liveRoomName = textController.text;
       Log.d('附加信息${liveRoomInfo.toJson().toString()}');
       return Get.toNamed(AppPath.myLiveRoom,
           arguments: MyLiveRoomConfigArgument(

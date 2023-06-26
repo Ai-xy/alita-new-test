@@ -35,8 +35,6 @@ class AnchorLiveEndController extends BaseAppController {
 
   Future follow() {
     return UserApi.followUser(userId: liveRoom.homeownerId ?? -1).then((value) {
-      print('值');
-      print(value);
       if (value == true) {
         isFollowed = true;
         update();
