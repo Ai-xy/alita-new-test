@@ -313,6 +313,11 @@ class UserProfilePage extends StatelessWidget {
                         onTap: () {
                           Get.toNamed(AppPath.feedback);
                         }),
+                    ProfileTileModel(
+                        label: AppMessage.blockList.tr,
+                        onTap: () {
+                          Get.toNamed(AppPath.blockListUserCenter);
+                        }),
                   ];
                   return UserProfileCard(
                     padding: EdgeInsets.only(

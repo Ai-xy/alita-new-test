@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
+import 'package:alita/api/user_api.dart';
 import 'package:alita/kit/app_date_time_kit.dart';
 import 'package:alita/pages/chat/chat_controller.dart';
 import 'package:alita/pages/chat/widgets/chat_bottom_input_field/chat_bottom_input_field.dart';
 import 'package:alita/pages/chat/widgets/chat_message_card.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/translation/app_translation.dart';
 import 'package:alita/util/log.dart';
 import 'package:flutter/material.dart';
@@ -29,13 +33,22 @@ class ChatPage extends StatelessWidget {
             actions:
                 _.conversation.session.lastMessageType != NIMMessageType.tip
                     ? [
-                        Image.asset(
-                          AppIcon.addFriend.uri,
-                          width: 42.w,
-                          height: 24.h,
-                        ),
+                        _.isFollowed == true
+                            ? Container()
+                            : IconButton(
+                                onPressed: () {
+                                  _.follow();
+                                },
+                                icon: Image.asset(
+                                  AppIcon.addFriend.uri,
+                                  width: 42.w,
+                                  height: 24.h,
+                                ),
+                              ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _reportDialog(_);
+                          },
                           icon: Image.asset(
                             AppIcon.more.uri,
                             width: 5.w,
@@ -117,5 +130,91 @@ class ChatPage extends StatelessWidget {
             ),
           ));
     });
+  }
+
+  // 举报弹窗
+  Future _reportDialog(ChatController controller) async {
+    Map<String, dynamic> extension =
+        jsonDecode(controller.conversation.nimUser?.toMap()['extension']);
+    print('举报弹${extension}');
+    int usId = int.parse('${extension['userId']}');
+    String yxId = extension['yxAccid'];
+    Get.dialog(Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.toNamed(AppPath.reportCommon, arguments: usId)
+                    ?.then((value) => Get.back());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Report',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+
+            /// block
+            GestureDetector(
+              onTap: () {
+                UserApi.blockUser(userId: usId, yxId: yxId);
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 0),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  ' Block ',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 25.w),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(254, 166, 35, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

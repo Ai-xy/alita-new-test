@@ -11,6 +11,8 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:nim_core/nim_core.dart';
 
+/// 房间内聊天信息
+
 class AppChatRoomMessageBox<T extends AppChatRoomController>
     extends StatelessWidget {
   const AppChatRoomMessageBox({Key? key}) : super(key: key);
@@ -63,7 +65,8 @@ class AppChatRoomMessageBox<T extends AppChatRoomController>
                   child: Row(
                     children: [
                       AppImage(
-                        _.userAvatar,
+                        //_.userAvatar,
+                        '${_.roomAuthorIcon}',
                         width: 32.r,
                         height: 32.r,
                         fit: BoxFit.cover,
@@ -71,7 +74,8 @@ class AppChatRoomMessageBox<T extends AppChatRoomController>
                       ),
                       Gap(12.w),
                       Text(
-                        '${_.user?.nickname}进入直播间',
+                        //'${_.user?.nickname}进入直播间',
+                        '${_.roomAuthorNickName}进入直播间',
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: AppColor.white,

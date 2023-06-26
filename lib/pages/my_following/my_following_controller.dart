@@ -5,6 +5,7 @@ import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/user_friend_entity.dart';
 import 'package:alita/model/ui/app_live_room_model.dart';
 import 'package:alita/pages/live_list/widgets/live_room_card.dart';
+import 'package:alita/pages/user_profile/user_profile_controller.dart';
 import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
@@ -18,6 +19,7 @@ class MyFollowingController extends BaseAppFutureLoadStateController {
   List<UserFriendEntity> followUserList2 = [];
   List<UserFriendEntity> followUserList3 = [];
 
+  final UserProfileController _controller = Get.find();
   @override
   Future loadData({Map? params}) {
     UserApi.getUserFriend(
@@ -34,6 +36,8 @@ class MyFollowingController extends BaseAppFutureLoadStateController {
       type: 3,
     ).then((value) {
       followUserList1 = value!;
+    }).then((value) {
+      _controller.loadData();
     }).whenComplete(update);
   }
 

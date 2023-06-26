@@ -15,6 +15,10 @@ abstract class AppChatRoomController extends BaseAppController {
   String get yxRoomId => '${liveRoom.yxRoomId}';
   String get streamUrl => '${liveRoom.streamUrl}';
 
+  // 进入直播间用户头像昵称
+  String? roomAuthorIcon;
+  String? roomAuthorNickName;
+
   final LiveRoomModel liveRoom;
 
   AppChatRoomController({required this.liveRoom});
@@ -152,6 +156,7 @@ abstract class AppChatRoomController extends BaseAppController {
         .then((value) {
       memberNum.value = value.data?.onlineUserCount ?? 1;
       Log.i('聊天室信息${value.toMap()} 当前在线数量${value.data?.onlineUserCount}');
+      update();
     }).then((value) {
       return NimCore.instance.chatroomService
           .fetchChatroomMembers(
@@ -164,7 +169,11 @@ abstract class AppChatRoomController extends BaseAppController {
         update();
         for (NIMChatroomMember item in chatroomMemberList) {
           Log.i('直播间成员${item.nickname}');
+          Log.d('${item.avatar}');
         }
+        roomAuthorIcon = chatroomMemberList.last.avatar;
+        roomAuthorNickName = chatroomMemberList.last.nickname;
+        update();
       });
     });
   }
@@ -194,6 +203,8 @@ abstract class AppChatRoomController extends BaseAppController {
 
   Future onEnterRoom() {
     // 保存im 房间id，关闭最小化窗口时使用。
+    roomAuthorIcon = userAvatar;
+    roomAuthorNickName = userNickname;
     AuthManager().setRoomId(yxRoomId);
     _listenLiveRoomState();
     return AppNimKit.instance

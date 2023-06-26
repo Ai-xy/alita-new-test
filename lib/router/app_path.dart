@@ -19,6 +19,7 @@ abstract class AppPath {
   static const String anchorCenter = '/anchorCenter';
   static const String liveData = '/liveData';
   static const String blockList = '/blockList';
+  static const String blockListUserCenter = '/blockListUserCenter';
   static const String anchorLiveEnd = '/anchorLiveEnd';
   static const String liveStreamEnd = '/liveStreamEnd';
   static const String anchorProfile = '/anchorProfile';

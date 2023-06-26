@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_icon.dart';
+import 'package:alita/api/user_api.dart';
 import 'package:alita/enum/app_gender.dart';
 import 'package:alita/model/ui/app_conversation_model.dart';
 import 'package:alita/model/ui/profile_tile_model.dart';
@@ -27,7 +30,7 @@ class AnchorProfilePage extends GetView<AnchorProfileController> {
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
-              // Do something when the button is pressed
+              _reportDialog(controller);
             },
           ),
         ],
@@ -88,25 +91,31 @@ class AnchorProfilePage extends GetView<AnchorProfileController> {
                 borderRadius: BorderRadius.circular(14.r),
               ),
               child: !controller.isMe
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          AppIcon.living.uri,
-                          width: 18.r,
-                          height: 18.r,
-                        ),
-                        Gap(4.w),
-                        Text(
-                          'Live',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColor.white,
+                  ? GestureDetector(
+                      onTap: () {
+                        controller.queryAuthorLiveRoomInfo(
+                            controller.userInfo!.userId!);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            AppIcon.living.uri,
+                            width: 18.r,
+                            height: 18.r,
                           ),
-                        ),
-                        Gap(8.w),
-                      ],
+                          Gap(4.w),
+                          Text(
+                            'Live',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: AppColor.white,
+                            ),
+                          ),
+                          Gap(8.w),
+                        ],
+                      ),
                     )
                   : Container(),
             ))
@@ -386,25 +395,41 @@ class AnchorProfilePage extends GetView<AnchorProfileController> {
       child: Row(
         children: [
           Expanded(
-            child: AppButton(
-              onTap: () {
-                controller.isFollowed
-                    ? AppToast.alert(message: 'You\'re already friends')
-                    : controller.follow();
-              },
-              text: ' Follow',
-              textStyle: TextStyle(
-                  color: const Color.fromRGBO(254, 166, 35, 1),
-                  fontSize: 16.sp),
-              color: AppColor.accentColor.withOpacity(.39),
-              withIcon: true,
-              icon: Image.asset(
-                AppIcon.anchorFollow.uri,
-                width: 20.r,
-                height: 20.r,
-              ),
-            ),
-          ),
+              child: controller.isFollowed
+                  ? AppButton(
+                      onTap: () {
+                        controller.isFollowed
+                            ? controller.unfollow()
+                            : controller.follow();
+                      },
+                      text: ' Followed',
+                      textStyle: TextStyle(
+                          color: const Color.fromRGBO(254, 166, 35, 1),
+                          fontSize: 16.sp),
+                      color: AppColor.accentColor.withOpacity(.39),
+                      withIcon: true,
+                      icon: Image.asset(
+                        AppIcon.anchorFollow.uri,
+                        width: 20.r,
+                        height: 20.r,
+                      ),
+                    )
+                  : AppButton(
+                      width: 160.w,
+                      text: AppMessage.follow.tr,
+                      onTap: () {
+                        controller.isFollowed
+                            ? controller.unfollow()
+                            : controller.follow();
+                      },
+                      withIcon: true,
+                      icon: Image.asset(
+                        AppIcon.anchorFollow.uri,
+                        width: 20.r,
+                        height: 20.r,
+                        color: Colors.white,
+                      ),
+                    )),
           Gap(24.w),
           Expanded(
             child: AppButton(
@@ -433,5 +458,89 @@ class AnchorProfilePage extends GetView<AnchorProfileController> {
         ],
       ),
     );
+  }
+
+  // 举报弹窗
+  Future _reportDialog(AnchorProfileController controller) async {
+    Get.dialog(Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.toNamed(AppPath.reportCommon,
+                        arguments: controller.userInfo?.userId)
+                    ?.then((value) => Get.back());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Report',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+
+            /// block
+            GestureDetector(
+              onTap: () {
+                UserApi.blockUser(
+                    userId: controller.userInfo!.userId!,
+                    yxId: controller.userInfo!.yxAccid!);
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 0),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  ' Block ',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 25.w),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(254, 166, 35, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

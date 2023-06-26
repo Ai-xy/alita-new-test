@@ -56,16 +56,20 @@ class SessionCard extends GetView<SessionListController> {
             ValueNotifier<bool> hasSlided = useState(false);
             useEffect(() {
               void listen() {
-                slidableController?.animation.value == 0;
-                hasSlided.value = slidableController?.animation.value != 0;
+                if (slidableController != null) {
+                  slidableController.animation.value == 0;
+                  hasSlided.value = slidableController.animation.value != 0;
+                }
+                // slidableController?.animation.value == 0;
+                // hasSlided.value = slidableController?.animation.value != 0;
               }
 
               slidableController?.animation.addListener(listen);
               return () {
                 slidableController?.animation.removeListener(listen);
-                slidableController?.dispose();
+                //slidableController?.dispose();
               };
-            }, []);
+            }, [slidableController]);
 
             return AnimatedContainer(
               color: hasSlided.value ? const Color(0xFFF6F1E5) : null,

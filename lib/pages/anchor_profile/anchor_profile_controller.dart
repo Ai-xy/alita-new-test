@@ -1,9 +1,17 @@
+import 'package:alita/api/live_api.dart';
 import 'package:alita/api/moment_api.dart';
 import 'package:alita/api/user_api.dart';
 import 'package:alita/base/base_app_controller.dart';
+import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/api/moment_model.dart';
 import 'package:alita/model/api/user_profile_model.dart';
+import 'package:alita/model/ui/app_live_room_model.dart';
+import 'package:alita/pages/live_list/widgets/live_room_card.dart';
+import 'package:alita/router/app_path.dart';
 import 'package:alita/util/log.dart';
+import 'package:alita/util/toast.dart';
+import 'package:bot_toast/bot_toast.dart';
+import 'package:get/get.dart';
 
 class AnchorProfileController extends BaseAppController {
   UserProfileModel? userInfo;
@@ -60,6 +68,51 @@ class AnchorProfileController extends BaseAppController {
   }
 
   Future follow() {
-    return UserApi.followUser(userId: userInfo?.userId ?? -1);
+    return UserApi.followUser(userId: userInfo?.userId ?? -1).then((value) {
+      if (value == true) {
+        isFollowed = true;
+        update();
+      }
+    });
+  }
+
+  Future unfollow() {
+    return UserApi.unfollowUser(userId: userInfo?.userId ?? -1).then((value) {
+      if (value == true) {
+        update();
+        isFollowed = false;
+      }
+    });
+  }
+
+  Future queryAuthorLiveRoomInfo(int userId) {
+    return LiveApi.queryAuthorLiveRoomInfo(userId).then((value) {
+      if (value != null) {
+        LiveRoomModel model = value;
+        CancelFunc cancelFunc = AppToast.loading();
+        LiveApi.getLiveStream(id: model.id ?? 0, password: '${model.password}')
+            .then((value) {
+          mLiveRoom = model;
+          mLiveRoom?.streamUrl = value;
+          if (model.lockFlag == "1") {
+            password = model.password;
+            Get.dialog(const CustomDialog());
+          } else {
+            if (model.liveState == 2) {
+              Get.toNamed(AppPath.liveRoom,
+                  arguments:
+                      AppLiveRoomModel(liveRoom: model, streamUrl: value),
+                  preventDuplicates: false);
+            } else {
+              AppToast.alert(
+                  message: 'The current user is not in the live stream');
+            }
+          }
+        }).whenComplete(cancelFunc);
+        return model;
+      } else {
+        AppToast.alert(message: 'The current user is not in the live stream');
+      }
+    });
   }
 }

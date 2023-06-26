@@ -7,6 +7,8 @@ import 'package:alita/pages/anchor_profile/anchor_profile_binding.dart';
 import 'package:alita/pages/anchor_profile/anchor_profile_page.dart';
 import 'package:alita/pages/block_list/block_list_binding.dart';
 import 'package:alita/pages/block_list/block_list_page.dart';
+import 'package:alita/pages/block_list_uer_center/block_list_user_center.dart';
+import 'package:alita/pages/block_list_uer_center/block_list_user_center_binding.dart';
 import 'package:alita/pages/chat/chat_binding.dart';
 import 'package:alita/pages/chat/chat_page.dart';
 import 'package:alita/pages/edit_profile/edit_profile_page.dart';
@@ -154,6 +156,11 @@ abstract class AppRouter {
       name: AppPath.blockList,
       binding: BlockListBinding(),
       page: () => const BlockListPage(),
+    ),
+    GetPage(
+      name: AppPath.blockListUserCenter,
+      binding: UserCenterBlockListBinding(),
+      page: () => const UserCenterBlockListPage(),
     ),
     GetPage(
       name: AppPath.anchorLiveEnd,

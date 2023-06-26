@@ -54,6 +54,7 @@ class LiveAnchorSheetController extends BaseAppController {
   }
 
   getMyUserInfo() {
+    Log.d('getMyUserInfo', tag: 'getMyUserInfo');
     UserApi.getMyLiveRoom().then((value) {
       LiveRoomModel liveRoomInfo = LiveRoomModel();
       liveRoomInfo = value;
@@ -63,7 +64,26 @@ class LiveAnchorSheetController extends BaseAppController {
 
   // 关注
   Future follow() {
-    return UserApi.followUser(userId: liveRoomUser?.userId ?? -1);
+    return UserApi.followUser(userId: liveRoomUser?.userId ?? -1).then((value) {
+      if (value == true) {
+        isFollowed = true;
+        update();
+      }
+    }).then((value) {
+      loadData();
+    });
+  }
+
+  Future unfollow() {
+    return UserApi.unfollowUser(userId: liveRoomUser?.userId ?? -1)
+        .then((value) {
+      if (value == true) {
+        update();
+        isFollowed = false;
+      }
+    }).then((value) {
+      loadData();
+    });
   }
 
   /// 踢出用户

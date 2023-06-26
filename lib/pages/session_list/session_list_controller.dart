@@ -39,8 +39,8 @@ class SessionListController extends BaseAppFutureLoadStateController {
 
   @override
   Future onRefreshData() {
-    // TODO: implement onRefreshData
-    loadData();
+    // 改了这里
+    //loadData();
 
     return super.onRefreshData();
   }

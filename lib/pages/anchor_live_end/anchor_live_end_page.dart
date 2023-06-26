@@ -43,48 +43,67 @@ class AnchorLiveEndPage extends GetView<AnchorLiveEndController> {
                 )),
             Positioned(
               top: 172.h,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    AppMessage.liveEnded.tr,
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: AppFontWeight.bold,
+              child: GetBuilder<AnchorLiveEndController>(builder: (_) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppMessage.liveEnded.tr,
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: AppFontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Gap(12.h),
-                  AppImage(
-                    '${controller.liveRoom.homeownerIcon}',
-                    width: 72.r,
-                    height: 72.r,
-                    borderRadius: BorderRadius.circular(36.r),
-                    fit: BoxFit.fill,
-                  ),
-                  Gap(9.h),
-                  Text(
-                    '${controller.liveRoom.homeownerNickname}',
-                    style: TextStyle(fontSize: 14.sp),
-                  ),
-                  Gap(32.h),
-                  AppButton(
-                    width: 160.w,
-                    text: AppMessage.follow.tr,
-                    onTap: () {
-                      controller.isFollowed
-                          ? AppToast.alert(message: 'You\'re already friends')
-                          : controller.follow();
-                    },
-                    withIcon: true,
-                    icon: Image.asset(
-                      AppIcon.anchorFollow.uri,
-                      width: 20.r,
-                      height: 20.r,
-                      color: Colors.white,
+                    Gap(12.h),
+                    AppImage(
+                      '${_.roomAuthor?.icon}',
+                      width: 72.r,
+                      height: 72.r,
+                      borderRadius: BorderRadius.circular(36.r),
+                      fit: BoxFit.fill,
                     ),
-                  ),
-                ],
-              ),
+                    Gap(9.h),
+                    Text(
+                      '${_.liveRoom.homeownerNickname}',
+                      style: TextStyle(fontSize: 14.sp),
+                    ),
+                    Gap(32.h),
+                    _.isFollowed
+                        ? AppButton(
+                            width: 160.w,
+                            text: 'Followed',
+                            onTap: () {
+                              _.isFollowed ? _.unfollow() : _.follow();
+                            },
+                            textStyle: const TextStyle(
+                              color: Color.fromRGBO(254, 166, 35, 1),
+                            ),
+                            color: const Color.fromRGBO(254, 166, 35, .39),
+                            withIcon: true,
+                            icon: Image.asset(
+                              AppIcon.anchorFollow.uri,
+                              width: 20.r,
+                              height: 20.r,
+                              color: const Color.fromRGBO(254, 166, 35, 1),
+                            ),
+                          )
+                        : AppButton(
+                            width: 160.w,
+                            text: AppMessage.follow.tr,
+                            onTap: () {
+                              _.isFollowed ? _.unfollow() : _.follow();
+                            },
+                            withIcon: true,
+                            icon: Image.asset(
+                              AppIcon.anchorFollow.uri,
+                              width: 20.r,
+                              height: 20.r,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ],
+                );
+              }),
             )
           ],
         ),

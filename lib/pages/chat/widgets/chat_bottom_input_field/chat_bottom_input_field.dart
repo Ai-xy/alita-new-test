@@ -71,11 +71,11 @@ class ChatBottomInputField extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset(
-                  AppIcon.chatGift.uri,
-                  width: 40.r,
-                  height: 40.r,
-                ),
+                // Image.asset(
+                //   AppIcon.chatGift.uri,
+                //   width: 40.r,
+                //   height: 40.r,
+                // ),
                 Gap(10.w),
                 Expanded(
                     child: Row(

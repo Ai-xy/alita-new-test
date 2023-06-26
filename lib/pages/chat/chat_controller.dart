@@ -1,11 +1,16 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:alita/api/user_api.dart';
 import 'package:alita/base/base_app_future_controller.dart';
 import 'package:alita/kit/app_media_kit.dart';
 import 'package:alita/kit/app_nim_kit.dart';
+import 'package:alita/local_storage/app_local_storge.dart';
+import 'package:alita/model/api/user_profile_model.dart';
 import 'package:alita/model/ui/app_conversation_model.dart';
+import 'package:alita/pages/user_profile/user_profile_controller.dart';
 import 'package:alita/util/log.dart';
 import 'package:alita/util/toast.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +49,9 @@ class ChatController extends BaseAppFutureLoadStateController {
   FlutterSoundPlayer player = FlutterSoundPlayer();
   bool isPlaying = false;
   bool isSendMsg = false;
+  bool isFollowed = false;
+
+  int? usersId;
 
   @override
   void onInit() {
@@ -52,6 +60,14 @@ class ChatController extends BaseAppFutureLoadStateController {
 
     yxSessionId = sessionId == 'null' ? mSessionId : sessionId;
 
+    Log.d('${conversation.nimUser?.toMap()}', tag: '会话信息');
+    Log.d('${conversation.session.toMap()}', tag: '会话信息');
+    if (conversation.nimUser?.toMap()['extension'] != null) {
+      Map map = jsonDecode(conversation.nimUser?.toMap()['extension']);
+      usersId = map['userId'];
+      Log.d('$usersId', tag: '会话信息');
+      getUserDetail();
+    }
 
     // NimCore.instance.messageService.createSession(
     //     sessionId: yxSessionId!,
@@ -199,6 +215,19 @@ class ChatController extends BaseAppFutureLoadStateController {
     await [Permission.audio].request();
   }
 
+  Future getUserDetail() {
+    return UserApi.getUserDetail(userId: usersId)
+        .then((value) {
+          if (value.data['followed'] == true) {
+            isFollowed = true;
+            update();
+          }
+          return value;
+        })
+        .catchError((err, s) {})
+        .whenComplete(update);
+  }
+
   // Future _scrollToAnchor(NIMMessage anchor) {
   // int index = messageList.indexWhere((e) => e.uuid == anchor.uuid);
   // if (index > 0) {
@@ -305,5 +334,17 @@ class ChatController extends BaseAppFutureLoadStateController {
     update();
   }
 
-
+  UserProfileModel? me;
+  final UserProfileController _controller = Get.find();
+  Future follow() {
+    return UserApi.followUser(userId: usersId ?? -1).then((value) {
+      if (value == true) {
+        isFollowed = true;
+        update();
+      }
+    }).then((value) {
+      _controller.loadData();
+      update();
+    });
+  }
 }

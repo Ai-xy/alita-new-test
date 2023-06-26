@@ -157,6 +157,45 @@ class LiveRoomCard extends StatelessWidget {
                     ),
                     Positioned(
                       top: 7.h,
+                      left: 8.w,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(.5),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Gap(10.w),
+                            Container(
+                              width: 4.0,
+                              height: 4.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: liveRoom.liveState == 2
+                                    ? const Color.fromRGBO(97, 196, 48, 1)
+                                    : const Color.fromRGBO(255, 50, 94, 1),
+                              ),
+                            ),
+                            Gap(2.w),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 1.w),
+                              child: Text(
+                                liveRoom.liveState == 2 ? 'Live' : 'End',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: AppColor.white,
+                                ),
+                              ),
+                            ),
+                            Gap(10.w),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 7.h,
                       right: 5.w,
                       child: Container(
                         decoration: BoxDecoration(

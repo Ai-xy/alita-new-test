@@ -68,7 +68,8 @@ abstract class UserApi {
 
   static Future getMyLiveRoom() {
     return Http.instance
-        .post(ApiRequest('/api/expand/wearLive/queryLiveRoom'))
+        .post(ApiRequest('/api/expand/wearLive/queryLiveRoom',
+            formData: {"searchValue": ""}))
         .then((value) {
       LiveRoomModel model = LiveRoomModel();
       model = LiveRoomModel.fromJson(value.data);
@@ -141,22 +142,41 @@ abstract class UserApi {
       'followUserId': userId,
     }))
         .then((value) {
-      AppToast.alert(message: '${value.message}');
+      if (value.code == '0000') {
+        AppToast.alert(message: 'Focus on success');
+        return Future.value(true);
+      } else {
+        AppToast.alert(message: '${value.message}');
+        return Future.value(false);
+      }
     });
   }
 
   static Future unfollowUser({required int userId}) {
-    return Http.instance.post(ApiRequest('/api/user/followUser', formData: {
+    return Http.instance
+        .post(ApiRequest('/api/user/followUser', formData: {
       'followUserId': userId,
       'followType': 2,
-    }));
+    }))
+        .then((value) {
+      AppToast.alert(message: '${value.message}');
+      return Future.value(true);
+    });
   }
 
-  static Future blockUser({required int userId}) {
-    return Http.instance.post(ApiRequest('/api/user/followUser', formData: {
-      'followUserId': userId,
-      'followType': 3,
-    }));
+  static Future blockUser({required int userId, required String yxId}) {
+    return Http.instance
+        .post(ApiRequest('/api/user/blockUser',
+            formData: {"type": 1, "userId": userId, "yxAccid": yxId}))
+        .then((value) {
+      if (value.code == '0000') {
+        AppToast.alert(message: 'Successfully block');
+        Get.back();
+      } else {
+        AppToast.alert(message: '${value.message}');
+        Get.back();
+      }
+    });
   }
 
   static Future<List<UserFriendEntity>?> getUserFriend({required int type}) {
@@ -246,6 +266,37 @@ abstract class UserApi {
         });
       } else {
         AppToast.alert(message: '${value.message}');
+      }
+    });
+  }
+
+  // 用户中心获取拉黑列表
+  static Future getBlockList() {
+    return Http.instance
+        .post(ApiRequest('/api/user/blackList', formData: {
+      "currentPage": 0,
+      "endTime": "",
+      "keyword": "",
+      "pageSize": 30,
+      "startTime": ""
+    }))
+        .then((value) {
+      return JsonConvert.fromJsonAsT<List<UserFriendEntity>>(value.data);
+    });
+  }
+
+  static Future removeFromBlockList(
+      {required int userId, required String yxId}) {
+    return Http.instance
+        .post(ApiRequest('/api/user/removeBlockUser',
+            formData: {"type": 1, "userId": userId, "yxAccid": yxId}))
+        .then((value) {
+      if (value.code == '0000') {
+        AppToast.alert(message: 'Success');
+        return Future.value(true);
+      } else {
+        AppToast.alert(message: '${value.message}');
+        return Future.value(false);
       }
     });
   }

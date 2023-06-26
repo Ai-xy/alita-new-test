@@ -1,6 +1,7 @@
 import 'package:alita/R/app_color.dart';
 import 'package:alita/R/app_font.dart';
 import 'package:alita/R/app_icon.dart';
+import 'package:alita/api/user_api.dart';
 import 'package:alita/enum/app_gender.dart';
 import 'package:alita/model/api/live_room_model.dart';
 import 'package:alita/model/ui/app_live_action_model.dart';
@@ -53,7 +54,7 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
                     ? Container()
                     : GestureDetector(
                         onTap: () {
-                          _showDialog(_);
+                          _reportDialog(_);
                         },
                         child: Image.asset(
                           AppIcon.anchorReport.uri,
@@ -228,49 +229,6 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
                           ],
                         )
                       : Container(),
-              // child: _.user?.userId == liveRoom?.homeownerId
-              //     ? _.isMe
-              //         ? Container()
-              //         : Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //             children: [
-              //               for (AppLiveActionModel action in [
-              //                 AppLiveActionModel(
-              //                     icon: AppIcon.userBlock.uri,
-              //                     label: '',
-              //                     onTap: () {
-              //                       _
-              //                           .blockUser(true)
-              //                           .then((value) => Get.back());
-              //                     }),
-              //                 AppLiveActionModel(
-              //                     icon: AppIcon.userMute.uri,
-              //                     label: '',
-              //                     onTap: () {
-              //                       _
-              //                           .muteAnchorTemp()
-              //                           .then((value) => Get.back());
-              //                     }),
-              //                 AppLiveActionModel(
-              //                     icon: AppIcon.userFollow.uri,
-              //                     label: '',
-              //                     onTap: () {
-              //                       _
-              //                           .kickOutAnchor()
-              //                           .then((value) => Get.back());
-              //                     }),
-              //               ])
-              //                 GestureDetector(
-              //                   onTap: action.onTap,
-              //                   child: Image.asset(
-              //                     action.icon,
-              //                     width: 48.r,
-              //                     height: 48.r,
-              //                   ),
-              //                 )
-              //             ],
-              //           )
-              //     : Container(),
             ),
             Gap(24.h),
             _.isMe
@@ -281,26 +239,39 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: AppButton(
-                            onTap: () {
-                              _.isFollowed
-                                  ? AppToast.alert(
-                                      message: 'You\'re already friends')
-                                  : _.follow();
-                            },
-                            text: ' Follow',
-                            textStyle: TextStyle(
-                                color: const Color.fromRGBO(254, 166, 35, 1),
-                                fontSize: 16.sp),
-                            color: AppColor.accentColor.withOpacity(.39),
-                            withIcon: true,
-                            icon: Image.asset(
-                              AppIcon.anchorFollow.uri,
-                              width: 20.r,
-                              height: 20.r,
-                            ),
-                          ),
-                        ),
+                            child: _.isFollowed
+                                ? AppButton(
+                                    onTap: () {
+                                      _.isFollowed ? _.unfollow() : _.follow();
+                                    },
+                                    text: ' Followed',
+                                    textStyle: TextStyle(
+                                        color: const Color.fromRGBO(
+                                            254, 166, 35, 1),
+                                        fontSize: 16.sp),
+                                    color:
+                                        AppColor.accentColor.withOpacity(.39),
+                                    withIcon: true,
+                                    icon: Image.asset(
+                                      AppIcon.anchorFollow.uri,
+                                      width: 20.r,
+                                      height: 20.r,
+                                    ),
+                                  )
+                                : AppButton(
+                                    width: 160.w,
+                                    text: AppMessage.follow.tr,
+                                    onTap: () {
+                                      _.isFollowed ? _.unfollow() : _.follow();
+                                    },
+                                    withIcon: true,
+                                    icon: Image.asset(
+                                      AppIcon.anchorFollow.uri,
+                                      width: 20.r,
+                                      height: 20.r,
+                                      color: Colors.white,
+                                    ),
+                                  )),
                         Gap(24.w),
                         Expanded(
                           child: AppButton(
@@ -326,6 +297,7 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
     ));
   }
 
+  // 举报
   void _showDialog(LiveAnchorSheetController controller) {
     Get.dialog(Scaffold(
       backgroundColor: Colors.transparent,
@@ -406,6 +378,88 @@ class LiveAnchorSheet extends GetView<LiveAnchorSheetController> {
             ),
           )
         ],
+      ),
+    ));
+  }
+
+  // 举报弹窗
+  Future _reportDialog(LiveAnchorSheetController controller) async {
+    Get.dialog(Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.toNamed(AppPath.reportCommon, arguments: controller.usId)
+                    ?.then((value) => Get.back());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Report',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+
+            /// block
+            GestureDetector(
+              onTap: () {
+                UserApi.blockUser(
+                    userId: controller.usId!, yxId: controller.yxAccid);
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 0),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  ' Block ',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 32, 32, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 12.w, 0, 25.w),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(254, 166, 35, 1),
+                  borderRadius: BorderRadius.circular(22.w),
+                ),
+                padding:
+                    EdgeInsets.symmetric(vertical: 14.w, horizontal: 137.w),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     ));
   }
